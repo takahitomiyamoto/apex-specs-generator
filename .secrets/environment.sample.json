@@ -1,0 +1,38 @@
+{
+  "secrets": {
+    "privateKey": ".secrets/server.key",
+    "clientId": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "username": "xxxxxxxxxx",
+    "hostname": "login.salesforce.com",
+    "asOfVersion": "50.0",
+    "myDomain": "xxxxx-dev-ed"
+  },
+  "docs": {
+    "root": "docs",
+    "apexClass": "docs/apex-class",
+    "apexTrigger": "docs/apex-trigger"
+  },
+  "logs": {
+    "root": ".logs",
+    "prefix": {
+      "listMetadata": ".logs/20.list-metadata",
+      "metadataTypeMembers": ".logs/30.members"
+    },
+    "apexClass": {
+      "rawData": ".logs/apex-class",
+      "symbolTable": ".logs/apex-class/symbol-table"
+    },
+    "apexTrigger": {
+      "rawData": ".logs/apex-trigger",
+      "symbolTable": ".logs/apex-trigger/symbol-table"
+    },
+    "loginJwt": ".logs/00.loginJwt.json",
+    "createMetadataContainer": ".logs/apex/10.create-metadata-container.json",
+    "retrieveApexClasses": ".logs/apex-class/11.retrieve-apex-classes.json",
+    "retrieveApexTriggers": ".logs/apex-trigger/11.retrieve-apex-triggers.json",
+    "createApexClassMembers": ".logs/apex-class/12.create-apex-class-members.json",
+    "createApexTriggerMembers": ".logs/apex-trigger/12.create-apex-trigger-members.json",
+    "createContainerAsyncRequest": ".logs/apex/13.create-container-async-request.json",
+    "retrieveContainerAsyncRequests": ".logs/apex/14.retrieve-container-async-requests.json"
+  }
+}
