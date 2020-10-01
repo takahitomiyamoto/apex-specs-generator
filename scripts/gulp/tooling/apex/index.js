@@ -10,9 +10,9 @@ import {
   asyncRetrieveContainerAsyncRequestState
 } from '../container-async-request';
 import { asyncCreateMetadataContainerId } from '../metadata-container';
-import { setConfig } from '../docs/config';
+import { setConfig } from '../doc/config';
 import { asyncCreateApexMembers } from './create';
-import { generateDocs } from '../docs';
+import { generateDocs } from '../doc';
 import { asyncRetrieveApex, asyncRetrieveApexMembers } from './retrieve';
 import { readFileSyncUtf8 } from '../../common/lib';
 
