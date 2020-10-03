@@ -16,13 +16,14 @@ import { generateDocs } from '../doc';
 import { asyncRetrieveApex, asyncRetrieveApexMembers } from './retrieve';
 import { readFileSyncUtf8 } from '../../common/lib';
 
+// The request in POST /tooling/composite can’t contain more than 25 operations.
 const COMPOSITE_OPERATIONS_LIMIT = 25;
 
 /**
- * @description batch
+ * @description runBatch
  * @param {*} params
  */
-async function batch(params) {
+async function runBatch(params) {
   // create ApexClassMembers / ApexTriggerMembers
   const apexMembers = await asyncCreateApexMembers({
     environment: params.environment,
@@ -61,7 +62,7 @@ async function batch(params) {
     folder: params.config.symbolTableFolder
   });
 
-  // archive
+  // archive .json
   results.forEach((result) => {
     writeFileSyncUtf8(result.symbolTable.filename, result.symbolTable.contents);
     console.log(result.symbolTable.filename);
@@ -71,11 +72,13 @@ async function batch(params) {
   const apexNames = params.apex.map((a) => {
     return a.Name;
   });
-  await generateDocs(params.environment, params.config, apexNames);
+  await generateDocs(params.config, apexNames);
 }
 
 /**
  * @description generate Apex Specifications
+ * @param {*} environment
+ * @param {*} apexType
  */
 async function generateApexSpecs(environment, apexType) {
   const config = setConfig(environment, apexType);
@@ -99,7 +102,7 @@ async function generateApexSpecs(environment, apexType) {
     fields: config.fields
   });
 
-  // The request can’t contain more than 25 operations.
+  // run the batch operation because the request can’t contain more than 25 operations.
   const size = JSON.parse(readFileSyncUtf8(config.retrieveLogFile)).size;
   const scope = COMPOSITE_OPERATIONS_LIMIT;
   let start = 0;
@@ -107,14 +110,14 @@ async function generateApexSpecs(environment, apexType) {
     const apex = apexRecords.slice(start, start + scope - 1);
 
     /**
-     * create ApexClassMembers / ApexTriggerMembers
-     * create ContainerAsyncRequest
-     * retrieve ContainerAsyncRequest - State
-     * retrieve ApexClassMembers / ApexTriggerMembers
-     * archive
-     * generate .md from .json
+     * 1. create ApexClassMembers / ApexTriggerMembers
+     * 2. create ContainerAsyncRequest
+     * 3. retrieve ContainerAsyncRequest - State
+     * 4. retrieve ApexClassMembers / ApexTriggerMembers
+     * 5. archive .json
+     * 6. generate .md from .json
      */
-    await batch({
+    await runBatch({
       environment: environment,
       loginJwt: loginJwt,
       config: config,

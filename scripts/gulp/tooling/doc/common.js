@@ -5,7 +5,7 @@ import { HEADERS_CLASS_TABLE, convert, escapeUnderscore } from './config';
 
 /**
  * @description getAnnotationNames
- * @param {*} modifiers
+ * @param {*} annotations
  */
 const getAnnotationNames = (annotations) => {
   if (!annotations.length) {

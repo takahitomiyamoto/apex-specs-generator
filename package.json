@@ -29,7 +29,7 @@
     "gulp-shell": "0.8.0",
     "heat-sfdx-common": "0.1.14",
     "heat-sfdx-tooling": "0.0.1",
-    "json2md": "1.7.1",
+    "json2md": "1.8.0",
     "prettier": "2.1.2",
     "prettier-plugin-apex": "1.7.0",
     "uuid": "8.3.0"

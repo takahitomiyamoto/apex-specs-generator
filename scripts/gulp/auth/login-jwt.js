@@ -5,7 +5,8 @@
 import { loginJwt, writeFileSyncUtf8 } from '../common/lib';
 
 /**
- * @name asyncLoginJwt
+ * @description asyncLoginJwt
+ * @param {*} environment
  */
 export async function asyncLoginJwt(environment) {
   // login

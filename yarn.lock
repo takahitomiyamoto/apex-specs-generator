@@ -1383,14 +1383,14 @@ camelcase@^3.0.0:
   integrity sha1-MvxLn82vhF/N9+c7uXysImHwqwo=
 
 caniuse-db@^1.0.30000977:
-  version "1.0.30001141"
-  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30001141.tgz#7567d40893cc589ceadbcfee42ceeca41c7daaeb"
-  integrity sha512-3QQYj4WLBA4DY3ArRmD+dgDH3fxv2twTbMSZsImYapmITyoVHOYhWLdlD7yUp3E6eq73vRC5FmQELZEcb9QqQQ==
+  version "1.0.30001142"
+  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30001142.tgz#0a274384e4223c139ad25ceaadaf4110d00fff81"
+  integrity sha512-nysCSvYxxXcSoUUjfHIulxh+hWjzxYvqo0+eEIv16y5TgSYBiTm2uRQlz6kfPerZ+RBHLRkaQc7QZn/zRmHwLA==
 
 caniuse-lite@^1.0.30001135:
-  version "1.0.30001141"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001141.tgz#214a196d81aa938b268fb0cb6d8fab23fdf14378"
-  integrity sha512-EHfInJHoQTmlMdVZrEc5gmwPc0zyN/hVufmGHPbVNQwlk7tJfCmQ2ysRZMY2MeleBivALUTyyxXnQjK18XrVpA==
+  version "1.0.30001142"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001142.tgz#a8518fdb5fee03ad95ac9f32a9a1e5999469c250"
+  integrity sha512-pDPpn9ankEpBFZXyCv2I4lh1v/ju+bqb78QfKf+w9XgDAFWBwSYPswXqprRdrgQWK0wQnpIbfwRjNHO1HWqvoQ==
 
 chalk@^2.0.0:
   version "2.4.2"
@@ -2925,10 +2925,10 @@ json-stable-stringify-without-jsonify@^1.0.1:
   resolved "https://registry.yarnpkg.com/json-stable-stringify-without-jsonify/-/json-stable-stringify-without-jsonify-1.0.1.tgz#9db7b59496ad3f3cfef30a75142d2d930ad72651"
   integrity sha1-nbe1lJatPzz+8wp1FC0tkwrXJlE=
 
-json2md@1.7.1:
-  version "1.7.1"
-  resolved "https://registry.yarnpkg.com/json2md/-/json2md-1.7.1.tgz#68555bc187e31e18976436a651cefb4ae928cc70"
-  integrity sha512-0typXnjSQaS4QiWq4cbe2DttUlvFMnTbtB9dByrMJcvaKscTu9zOli2C9yj3SU/3U3h25+KpMpWbh41/3HQeLw==
+json2md@1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/json2md/-/json2md-1.8.0.tgz#568ff5508b8002de62df5a79c26a84e9ad4bc5c0"
+  integrity sha512-sEwJGqqde09/yD9PMZ/+Wapdoihx6pnUKJ1ra+hU/csGoUt9Nh7w3VcD9CUouT1U77Ju9ft6q3/az/yBySs6DA==
   dependencies:
     indento "^1.1.7"
 
@@ -4717,9 +4717,9 @@ y18n@^3.2.1:
   integrity sha1-bRX7qITAhnnA136I53WegR4H+kE=
 
 y18n@^5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/y18n/-/y18n-5.0.1.tgz#1ad2a7eddfa8bce7caa2e1f6b5da96c39d99d571"
-  integrity sha512-/jJ831jEs4vGDbYPQp4yGKDYPSCCEQ45uZWJHE1AoYBzqdZi8+LDWas0z4HrmJXmKdpFsTiowSHXdxyFhpmdMg==
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/y18n/-/y18n-5.0.2.tgz#48218df5da2731b4403115c39a1af709c873f829"
+  integrity sha512-CkwaeZw6dQgqgPGeTWKMXCRmMcBgETFlTml1+ZOO+q7kGst8NREJ+eWwFNPVUQ4QGdAaklbqCZHH6Zuep1RjiA==
 
 yargs-parser@5.0.0-security.0:
   version "5.0.0-security.0"
@@ -4730,9 +4730,9 @@ yargs-parser@5.0.0-security.0:
     object.assign "^4.1.0"
 
 yargs-parser@^20.0.0:
-  version "20.2.0"
-  resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-20.2.0.tgz#944791ca2be2e08ddadd3d87e9de4c6484338605"
-  integrity sha512-2agPoRFPoIcFzOIp6656gcvsg2ohtscpw2OINr/q46+Sq41xz2OYLqx5HRHabmFU1OARIPAYH5uteICE7mn/5A==
+  version "20.2.1"
+  resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-20.2.1.tgz#28f3773c546cdd8a69ddae68116b48a5da328e77"
+  integrity sha512-yYsjuSkjbLMBp16eaOt7/siKTjNVjMm3SoJnIg3sEh/JsvqVVDyjRKmaJV4cl+lNIgq6QEco2i3gDebJl7/vLA==
 
 yargs@^16.0.2:
   version "16.0.3"

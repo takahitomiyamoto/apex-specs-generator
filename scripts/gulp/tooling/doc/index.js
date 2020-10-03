@@ -55,11 +55,11 @@ const getJsonApex = (config, apexMember) => {
 };
 
 /**
- * @description generateMarkdown
- * @param {*} environment
+ * @description generateMarkdownSpecs
+ * @param {*} config
  * @param {*} apexMember
  */
-const generateMarkdown = (environment, config, apexMember) => {
+const generateMarkdownSpecs = (config, apexMember) => {
   const jsonApex = getJsonApex(config, apexMember);
   const jsonApexMember = getJsonApexMember(config, apexMember);
 
@@ -104,11 +104,16 @@ const generateMarkdown = (environment, config, apexMember) => {
 
 /**
  * @description generateDocs
- * @param {*} environment
  * @param {*} config
+ * @param {*} apexNames
  */
-export async function generateDocs(environment, config, apexNames) {
+export async function generateDocs(config, apexNames) {
   apexNames.forEach((apexName) => {
-    generateMarkdown(environment, config, apexName);
+    generateMarkdownSpecs(config, apexName);
   });
+
+  // TODO: BodyCrc と LengthWithoutComments を一覧化してチェックできるようにする
+  // apexNames.forEach((apexName) => {
+  //   generateMarkdownList(config, apexName);
+  // });
 }
