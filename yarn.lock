@@ -1383,14 +1383,14 @@ camelcase@^3.0.0:
   integrity sha1-MvxLn82vhF/N9+c7uXysImHwqwo=
 
 caniuse-db@^1.0.30000977:
-  version "1.0.30001142"
-  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30001142.tgz#0a274384e4223c139ad25ceaadaf4110d00fff81"
-  integrity sha512-nysCSvYxxXcSoUUjfHIulxh+hWjzxYvqo0+eEIv16y5TgSYBiTm2uRQlz6kfPerZ+RBHLRkaQc7QZn/zRmHwLA==
+  version "1.0.30001143"
+  resolved "https://registry.yarnpkg.com/caniuse-db/-/caniuse-db-1.0.30001143.tgz#2e06b0361d4f3e03c7cc06bf4c80f440a072bac0"
+  integrity sha512-daz/e6P7IFzVUnlyRXkbw4LehPxXgZrkgnfuBYemllV8bscI/KqQpOYUA0s7Q0m6nq5oAkwJtw9ewYxK82Q0fg==
 
 caniuse-lite@^1.0.30001135:
-  version "1.0.30001142"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001142.tgz#a8518fdb5fee03ad95ac9f32a9a1e5999469c250"
-  integrity sha512-pDPpn9ankEpBFZXyCv2I4lh1v/ju+bqb78QfKf+w9XgDAFWBwSYPswXqprRdrgQWK0wQnpIbfwRjNHO1HWqvoQ==
+  version "1.0.30001143"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001143.tgz#560f2cfb9f313d1d7e52eb8dac0e4e36c8821c0d"
+  integrity sha512-p/PO5YbwmCpBJPxjOiKBvAlUPgF8dExhfEpnsH+ys4N/791WHrYrGg0cyHiAURl5hSbx5vIcjKmQAP6sHDYH3w==
 
 chalk@^2.0.0:
   version "2.4.2"
@@ -2568,10 +2568,10 @@ heat-sfdx-common@0.1.14:
     uuid "8.2.0"
     xml2js "0.4.23"
 
-heat-sfdx-tooling@0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/heat-sfdx-tooling/-/heat-sfdx-tooling-0.0.1.tgz#9697fafdeeb4cd03fee3e95d3d3ffa62d0a3d578"
-  integrity sha512-Z0X14xwt/QY0S95yu6JKPfn8ONkDcof9bWvGcYBJgaenQeyX3MrTq7IXP0CJ+PeGq+6f3QQujdFFyMlTV05iMA==
+heat-sfdx-tooling@0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/heat-sfdx-tooling/-/heat-sfdx-tooling-0.0.2.tgz#b51ebb10b6c0f2679cc81c3ee542314d1177d73e"
+  integrity sha512-sOIlIkI/HS3Rulbu8a0gzWpf3sLaIZiEMgDv2CiDx7n61ItdEiokLMRTNZQ1d6KEyg9/jvBdTiKjQiEA7mdx9w==
   dependencies:
     heat-sfdx-common "0.1.14"
     typescript "4.0.3"

@@ -40,3 +40,8 @@ yarn gulp:specs:apex:generate && yarn prettier
 ```
 
 You can see your Apex specification documents in `docs/`.
+
+## Acknowledgments
+
+- [ApexDoc](https://github.com/SalesforceFoundation/ApexDoc)
+- [TypeDoc](https://github.com/TypeStrong/typedoc)
