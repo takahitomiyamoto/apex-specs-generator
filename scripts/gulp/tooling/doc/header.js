@@ -1,16 +1,20 @@
 /**
  * @name doc/header.js
  */
-import { HEADERS_HEADER_TABLE, HEADERS_TRIGGER_TABLE } from './config';
-import { createClassCode, createClassTable } from './common';
+import { TABLE_HEADER_HEADER, TABLE_HEADER_TRIGGER } from './config';
+import {
+  createCodeClass,
+  createTableClass,
+  createTableHeaderApexDoc
+} from './common';
 
 /**
- * @description createHeaderTable
+ * @description createTableHeader
  * @param {*} params
  */
-const createHeaderTable = (params) => {
+const createTableHeader = (params) => {
   return {
-    headers: HEADERS_HEADER_TABLE,
+    headers: TABLE_HEADER_HEADER,
     rows: [
       [
         `${params.namespace}`,
@@ -22,12 +26,12 @@ const createHeaderTable = (params) => {
 };
 
 /**
- * @description createTriggerTable
+ * @description createTableTrigger
  * @param {*} params
  */
-const createTriggerTable = (params) => {
+const createTableTrigger = (params) => {
   return {
-    headers: HEADERS_TRIGGER_TABLE,
+    headers: TABLE_HEADER_TRIGGER,
     rows: [
       [
         `${params.usageBeforeInsert ? 'Y' : ''}`,
@@ -43,21 +47,21 @@ const createTriggerTable = (params) => {
 };
 
 /**
- * @description createTriggerCodeContent
+ * @description createCodeContentTrigger
  * @param {*} params
  */
-const createTriggerCodeContent = (params) => {
+const createCodeContentTrigger = (params) => {
   return [`trigger ${params.name} on ${params.entityDefinition.DeveloperName}`];
 };
 
 /**
- * @description createTriggerCode
+ * @description createCodeTrigger
  * @param {*} params
  */
-const createTriggerCode = (params) => {
+const createCodeTrigger = (params) => {
   return {
     language: 'java',
-    content: createTriggerCodeContent(params)
+    content: createCodeContentTrigger(params)
   };
 };
 
@@ -68,62 +72,70 @@ const createTriggerCode = (params) => {
 const createHeaderAreaApexClass = (params) => {
   return [
     {
-      table: createHeaderTable(params)
+      table: createTableHeader(params)
     },
     {
-      table: createClassTable(params)
+      table: createTableClass(params)
     },
     {
-      code: createClassCode(params)
+      table: createTableHeaderApexDoc(params)
+    },
+    {
+      code: createCodeClass(params)
     }
   ];
 };
 
 /**
- * @description createHeaderAreaApexTrigger
+ * @description createHeaderAreaTrigger
  * @param {*} params
  */
-const createHeaderAreaApexTrigger = (params) => {
+const createHeaderAreaTrigger = (params) => {
   return [
     {
-      table: createHeaderTable(params)
+      table: createTableHeader(params)
     },
     {
-      table: createTriggerTable(params)
+      table: createTableTrigger(params)
     },
     {
-      code: createTriggerCode(params)
+      table: createTableHeaderApexDoc(params)
+    },
+    {
+      code: createCodeTrigger(params)
     }
   ];
 };
 
 /**
  * @description createHeaderArea
- * @param {*} jsonApex
- * @param {*} jsonApexMember
+ * @param {*} params
  */
-export const createHeaderArea = (jsonApex, jsonApexMember) => {
+export const createHeaderArea = (params) => {
+  const apex = params.apex;
+  const apexMember = params.apexMember;
   // Common
-  const namespace = jsonApexMember.namespace;
-  const manageableState = jsonApex.ManageableState;
-  const apiVersion = jsonApex.ApiVersion.toFixed(1);
-  const attributes = jsonApex.attributes;
-  const table = jsonApexMember.tableDeclaration;
+  const namespace = apexMember.namespace;
+  const manageableState = apex.ManageableState;
+  const apiVersion = apex.ApiVersion.toFixed(1);
+  const attributes = apex.attributes;
+  const body = apex.Body;
+  const table = apexMember.tableDeclaration;
   const name = table.name;
   // ApexClass
   const annotations = table.annotations;
   const modifiers = table.modifiers;
-  const parentClass = jsonApexMember.parentClass;
-  const interfaces = jsonApexMember.interfaces;
+  const parentClass = apexMember.parentClass;
+  const interfaces = apexMember.interfaces;
   // ApexTrigger
-  const usageBeforeInsert = jsonApex.UsageBeforeInsert;
-  const usageBeforeUpdate = jsonApex.UsageBeforeUpdate;
-  const usageBeforeDelete = jsonApex.UsageBeforeDelete;
-  const usageAfterInsert = jsonApex.UsageAfterInsert;
-  const usageAfterUpdate = jsonApex.UsageAfterUpdate;
-  const usageAfterDelete = jsonApex.UsageAfterDelete;
-  const usageAfterUndelete = jsonApex.UsageAfterUndelete;
-  const entityDefinition = jsonApex.EntityDefinition;
+  const usageBeforeInsert = apex.UsageBeforeInsert;
+  const usageBeforeUpdate = apex.UsageBeforeUpdate;
+  const usageBeforeDelete = apex.UsageBeforeDelete;
+  const usageAfterInsert = apex.UsageAfterInsert;
+  const usageAfterUpdate = apex.UsageAfterUpdate;
+  const usageAfterDelete = apex.UsageAfterDelete;
+  const usageAfterUndelete = apex.UsageAfterUndelete;
+  const entityDefinition = apex.EntityDefinition;
 
   switch (attributes.type) {
     case 'ApexClass':
@@ -135,10 +147,11 @@ export const createHeaderArea = (jsonApex, jsonApexMember) => {
         modifiers: modifiers,
         name: name,
         parentClass: parentClass,
-        interfaces: interfaces
+        interfaces: interfaces,
+        body: body
       });
     case 'ApexTrigger':
-      return createHeaderAreaApexTrigger({
+      return createHeaderAreaTrigger({
         namespace: namespace,
         manageableState: manageableState,
         apiVersion: apiVersion,
@@ -150,7 +163,8 @@ export const createHeaderArea = (jsonApex, jsonApexMember) => {
         usageAfterDelete: usageAfterDelete,
         usageAfterUndelete: usageAfterUndelete,
         name: name,
-        entityDefinition: entityDefinition
+        entityDefinition: entityDefinition,
+        body: body
       });
     default:
       return {};
