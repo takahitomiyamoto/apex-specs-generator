@@ -3,16 +3,16 @@
  */
 import {
   NOT_APPLICABLE,
-  HEADERS_EXTERNAL_REFERENCES_TABLE,
+  TABLE_HEADER_EXTERNAL_REFERENCES,
   TITLE_EXTERNAL_REFERENCES
 } from './config';
 import { getMethods, getVariables } from './common';
 
 /**
- * @description createExternalReferencesTableRows
+ * @description createTableRowsExternalReferences
  * @param {*} params
  */
-const createExternalReferencesTableRows = (params) => {
+const createTableRowsExternalReferences = (params) => {
   return params.map((exte) => {
     return [
       `${exte.namespace}`,
@@ -24,13 +24,13 @@ const createExternalReferencesTableRows = (params) => {
 };
 
 /**
- * @description createExternalReferencesTable
+ * @description createTableExternalReferences
  * @param {*} params
  */
-const createExternalReferencesTable = (params) => {
+const createTableExternalReferences = (params) => {
   return {
-    headers: HEADERS_EXTERNAL_REFERENCES_TABLE,
-    rows: createExternalReferencesTableRows(params)
+    headers: TABLE_HEADER_EXTERNAL_REFERENCES,
+    rows: createTableRowsExternalReferences(params)
   };
 };
 
@@ -39,14 +39,15 @@ const createExternalReferencesTable = (params) => {
  * @param {*} params
  */
 export const createExternalReferencesArea = (params) => {
+  const externalReferences = params.externalReferences;
   const result = [];
   result.push({ h2: TITLE_EXTERNAL_REFERENCES });
 
-  if (!params.length) {
+  if (!externalReferences.length) {
     result.push({ p: NOT_APPLICABLE });
   } else {
     result.push({
-      table: createExternalReferencesTable(params)
+      table: createTableExternalReferences(externalReferences)
     });
   }
 
