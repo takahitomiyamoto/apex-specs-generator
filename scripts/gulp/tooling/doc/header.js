@@ -2,14 +2,14 @@
  * @name doc/header.js
  */
 import {
-  REGEXP_HEADER_TAGS_START,
-  REGEXP_HEADER_SIGNATURE_CLASS,
+  REGEXP_HEADER_CLASS,
+  REGEXP_HEADER_TRIGGER,
+  REGEXP_HEADER_SIGNATURE_START,
   REGEXP_HEADER_SIGNATURE_END,
-  REGEXP_HEADER_SIGNATURE_TRIGGER,
   REGEXP_HEADER_TAGS,
+  REGEXP_HEADER_TAGS_AREA,
   TABLE_HEADER_HEADER
 } from './config';
-import { getAnnotations } from './common';
 import { createHeaderAreaApexClass } from './apex-class';
 import { createHeaderAreaTrigger } from './apex-trigger';
 
@@ -60,13 +60,8 @@ const _createListApexDoc = (item) => {
  * @param {*} params
  * @param {*} header
  */
-const _createCodeContent = (params, header) => {
+const _createCodeContent = (header) => {
   const content = [];
-
-  if (params.annotations) {
-    const annotations = getAnnotations(params.annotations);
-    content.push(annotations);
-  }
 
   content.push(header.signature);
   return content;
@@ -79,42 +74,28 @@ const _createCodeContent = (params, header) => {
  */
 const _parseBodyHeader = (body, regexp) => {
   body = body.replace(/\r\n/g, '\n');
-  const arrayBody = body.split('\n');
-  const reversedBody = arrayBody.reverse();
 
-  const headerBody = body.match(regexp.regexpSignature);
-
-  let name;
-  let signature = '';
-
-  name = headerBody[0].replace(regexp.regexpSignature, '$1');
-  signature = headerBody[0]
-    .replace(regexp.regexpSignatureEnd, '')
-    .replace(/\n/g, '')
-    .replace(/\s[\s]+/g, ' ')
-    .replace(/\(\s/, '(');
-
-  const header = [];
-  let tags = [];
-
-  reversedBody.forEach((line) => {
-    if (regexp.regexpTags.test(line)) {
-      tags.push({
-        key: line.replace(regexp.regexpTags, '$1'),
-        value: line.replace(regexp.regexpTags, '$2')
+  const headerRaws = body.match(regexp.header);
+  const header = !headerRaws
+    ? []
+    : headerRaws.map((raw) => {
+        return {
+          tags: raw
+            .replace(regexp.header, '$1')
+            .match(regexp.tags)
+            .map((tag) => {
+              return {
+                key: tag.replace(regexp.tags, '$1'),
+                value: tag.replace(regexp.tags, '$2')
+              };
+            }),
+          name: raw.replace(regexp.header, '$2'),
+          signature: raw
+            .replace(regexp.tagsArea, '')
+            .replace(regexp.signatureStart, '')
+            .replace(regexp.signatureEnd, '')
+        };
       });
-    }
-    if (regexp.regexpTagsStart.test(line)) {
-      header.push({
-        name: name,
-        signature: signature,
-        tags: tags.reverse()
-      });
-      name = '';
-      signature = '';
-      tags = [];
-    }
-  });
 
   return {
     header: header
@@ -208,12 +189,18 @@ export const createHeaderArea = (params) => {
  */
 export const parseBodyHeader = (body, type) => {
   return _parseBodyHeader(body, {
-    regexpSignature:
-      'ApexClass' === type
-        ? REGEXP_HEADER_SIGNATURE_CLASS
-        : REGEXP_HEADER_SIGNATURE_TRIGGER,
-    regexpSignatureEnd: REGEXP_HEADER_SIGNATURE_END,
-    regexpTags: REGEXP_HEADER_TAGS,
-    regexpTagsStart: REGEXP_HEADER_TAGS_START
+    // regexpSignature:
+    //   'ApexClass' === type
+    //     ? REGEXP_HEADER_SIGNATURE_CLASS
+    //     : REGEXP_HEADER_SIGNATURE_TRIGGER,
+    // regexpSignatureEnd: REGEXP_HEADER_SIGNATURE_END,
+    // regexpTags: REGEXP_HEADER_TAGS,
+    // regexpTagsStart: REGEXP_HEADER_TAGS_START,
+    // //
+    header: 'ApexClass' === type ? REGEXP_HEADER_CLASS : REGEXP_HEADER_TRIGGER,
+    signatureStart: REGEXP_HEADER_SIGNATURE_START,
+    signatureEnd: REGEXP_HEADER_SIGNATURE_END,
+    tags: REGEXP_HEADER_TAGS,
+    tagsArea: REGEXP_HEADER_TAGS_AREA
   });
 };
