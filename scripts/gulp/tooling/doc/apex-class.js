@@ -1,28 +1,7 @@
 /**
  * @name doc/apex-class.js
  */
-import {
-  createApexDocArea,
-  createCodeClass,
-  createTableClass,
-  getAnnotations
-} from './common';
-
-/**
- * @description _createCodeContentClass
- * @param {*} params
- */
-const _createCodeContentClass = (params, body) => {
-  const content = [];
-
-  if (params.annotations.length) {
-    const annotations = getAnnotations(params.annotations);
-    content.push(annotations);
-  }
-
-  content.push(body.header.signature);
-  return content;
-};
+import { createApexDocArea, createCode, createTableClass } from './common';
 
 /**
  * @description createHeaderAreaApexClass
@@ -30,6 +9,12 @@ const _createCodeContentClass = (params, body) => {
  * @param {*} funcs
  */
 export const createHeaderAreaApexClass = (params, funcs) => {
+  const body = params.body;
+
+  const item = body.header.filter((i) => {
+    return params.name === i.name;
+  })[0];
+
   return [
     {
       table: funcs.createTableHeader(params)
@@ -37,13 +22,9 @@ export const createHeaderAreaApexClass = (params, funcs) => {
     {
       table: createTableClass(params)
     },
-    createApexDocArea(
-      params.body,
-      funcs.createTableRowsApexDoc,
-      funcs.createListApexDoc
-    ),
+    createApexDocArea(item, funcs),
     {
-      code: createCodeClass(params, params.body, _createCodeContentClass)
+      code: createCode(params, item, funcs.createCodeContent)
     }
   ];
 };
