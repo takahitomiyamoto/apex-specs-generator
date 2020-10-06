@@ -3,25 +3,14 @@
  */
 import {
   NOT_APPLICABLE,
-  REGEXP_INNER_CLASS_DESCRIPTION,
-  REGEXP_INNER_CLASS_NAME,
-  REGEXP_INNER_CLASS_NAME_PREFIX,
-  REGEXP_INNER_CLASS_OTHERS_VALUE_PREFIX,
-  REGEXP_INNER_CLASS_OTHERS_KEY,
-  REGEXP_INNER_CLASS_OTHERS_KEY_PREFIX,
-  REGEXP_INNER_CLASS_OTHERS_KEY_SUFFIX,
-  REGEXP_INNER_CLASS_SIGNATURE,
-  REGEXP_INNER_CLASS_SIGNATURE_PREFIX,
-  REGEXP_INNER_CLASS_SIGNATURE_SUFFIX,
-  REGEXP_INNER_CLASS_END,
+  REGEXP_INNER_CLASS_TAGS_AREA,
+  REGEXP_INNER_CLASS,
+  REGEXP_INNER_CLASS_SIGNATURE_START,
+  REGEXP_INNER_CLASS_SIGNATURE_END,
+  REGEXP_INNER_CLASS_TAGS,
   TITLE_INNER_CLASSES
 } from './config';
-import {
-  createApexDocArea,
-  createCodeClass,
-  createTableClass,
-  getAnnotations
-} from './common';
+import { createApexDocArea, createCode, createTableClass } from './common';
 import { createInnerPropertiesArea } from './inner-properties';
 
 /**
@@ -40,7 +29,8 @@ const _createTableRowsApexDoc = (item) => {
  * @param {*} item
  */
 const _createListApexDoc = (item) => {
-  return item.tags.map((tag) => {
+  const tags = item.tags;
+  return tags.map((tag) => {
     return `**\`${tag.key}\`** : ${tag.value}`;
   });
 };
@@ -50,13 +40,8 @@ const _createListApexDoc = (item) => {
  * @param {*} params
  * @param {*} innerClass
  */
-const _createCodeContentClass = (params, innerClass) => {
+const _createCodeContentClass = (innerClass) => {
   const content = [];
-
-  if (params.annotations.length) {
-    const annotations = getAnnotations(params.annotations);
-    content.push(annotations);
-  }
 
   content.push(innerClass.signature);
   return content;
@@ -94,7 +79,7 @@ const _createInnerClasses = (params) => {
         createListApexDoc: _createListApexDoc
       }),
       {
-        code: createCodeClass(innerClass, item, _createCodeContentClass)
+        code: createCode(item, _createCodeContentClass)
       }
     ];
   });
@@ -123,46 +108,29 @@ export const createInnerClassesArea = (params) => {
  * @param {*} regexp
  */
 const _parseBodyInnerClass = (body, regexp) => {
-  body = body.replace(/\r\n/, /\n/);
-  const arrayBody = body.split(/\n/);
-  const reversedBody = arrayBody.reverse();
+  body = body.replace(/\r\n/g, '\n');
 
-  const innerClass = [];
-
-  let name;
-  let signature;
-  let tags = [];
-  let start = false;
-  reversedBody.forEach((line) => {
-    if (regexp.regexpSignature.test(line)) {
-      name = line
-        .match(regexp.regexpName)[0]
-        .replace(regexp.regexpNamePrefix, '');
-      signature = line
-        .replace(regexp.regexpSignaturePrefix, '')
-        .replace(regexp.regexpSignatureSuffix, '');
-      start = true;
-    }
-    if (start && regexp.regexpOthersValuePrefix.test(line)) {
-      tags.push({
-        key: line
-          .match(regexp.regexpOthersKey)[0]
-          .replace(regexp.regexpOthersKeyPrefix, ''),
-        value: line.replace(regexp.regexpOthersValuePrefix, '')
+  const innerClassRaws = body.match(regexp.innerClass);
+  const innerClass = !innerClassRaws
+    ? []
+    : innerClassRaws.map((raw) => {
+        return {
+          tags: raw
+            .replace(regexp.innerClass, '$1')
+            .match(regexp.tags)
+            .map((tag) => {
+              return {
+                key: tag.replace(regexp.tags, '$1'),
+                value: tag.replace(regexp.tags, '$2')
+              };
+            }),
+          name: raw.replace(regexp.innerClass, '$2'),
+          signature: raw
+            .replace(regexp.tagsArea, '')
+            .replace(regexp.signatureStart, '')
+            .replace(regexp.signatureEnd, '')
+        };
       });
-    }
-    if (start && regexp.regexpEnd.test(line)) {
-      innerClass.push({
-        name: name,
-        signature: signature,
-        tags: tags.reverse()
-      });
-      name = '';
-      signature = '';
-      tags = [];
-      start = false;
-    }
-  });
 
   return {
     innerClass: innerClass
@@ -175,16 +143,10 @@ const _parseBodyInnerClass = (body, regexp) => {
  */
 export const parseBodyInnerClass = (body) => {
   return _parseBodyInnerClass(body, {
-    regexpDescription: REGEXP_INNER_CLASS_DESCRIPTION,
-    regexpOthersKey: REGEXP_INNER_CLASS_OTHERS_KEY,
-    regexpOthersKeyPrefix: REGEXP_INNER_CLASS_OTHERS_KEY_PREFIX,
-    regexpOthersKeySuffix: REGEXP_INNER_CLASS_OTHERS_KEY_SUFFIX,
-    regexpOthersValuePrefix: REGEXP_INNER_CLASS_OTHERS_VALUE_PREFIX,
-    regexpSignature: REGEXP_INNER_CLASS_SIGNATURE,
-    regexpSignaturePrefix: REGEXP_INNER_CLASS_SIGNATURE_PREFIX,
-    regexpSignatureSuffix: REGEXP_INNER_CLASS_SIGNATURE_SUFFIX,
-    regexpName: REGEXP_INNER_CLASS_NAME,
-    regexpNamePrefix: REGEXP_INNER_CLASS_NAME_PREFIX,
-    regexpEnd: REGEXP_INNER_CLASS_END
+    innerClass: REGEXP_INNER_CLASS,
+    signatureStart: REGEXP_INNER_CLASS_SIGNATURE_START,
+    signatureEnd: REGEXP_INNER_CLASS_SIGNATURE_END,
+    tags: REGEXP_INNER_CLASS_TAGS,
+    tagsArea: REGEXP_INNER_CLASS_TAGS_AREA
   });
 };
