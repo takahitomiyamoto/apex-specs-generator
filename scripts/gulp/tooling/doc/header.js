@@ -94,6 +94,9 @@ const _parseBodyHeader = (body, regexp) => {
             .replace(regexp.tagsArea, '')
             .replace(regexp.signatureStart, '')
             .replace(regexp.signatureEnd, '')
+            .replace(/\n/g, '')
+            .replace(/\s+/g, ' ')
+            .replace(/\(\s/g, '(')
         };
       });
 
@@ -189,14 +192,6 @@ export const createHeaderArea = (params) => {
  */
 export const parseBodyHeader = (body, type) => {
   return _parseBodyHeader(body, {
-    // regexpSignature:
-    //   'ApexClass' === type
-    //     ? REGEXP_HEADER_SIGNATURE_CLASS
-    //     : REGEXP_HEADER_SIGNATURE_TRIGGER,
-    // regexpSignatureEnd: REGEXP_HEADER_SIGNATURE_END,
-    // regexpTags: REGEXP_HEADER_TAGS,
-    // regexpTagsStart: REGEXP_HEADER_TAGS_START,
-    // //
     header: 'ApexClass' === type ? REGEXP_HEADER_CLASS : REGEXP_HEADER_TRIGGER,
     signatureStart: REGEXP_HEADER_SIGNATURE_START,
     signatureEnd: REGEXP_HEADER_SIGNATURE_END,
