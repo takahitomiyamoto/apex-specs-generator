@@ -24,7 +24,7 @@ export const createHeaderAreaApexClass = (params, funcs) => {
     },
     createApexDocArea(item, funcs),
     {
-      code: createCode(params, item, funcs.createCodeContent)
+      code: createCode(item, funcs.createCodeContent)
     }
   ];
 };
