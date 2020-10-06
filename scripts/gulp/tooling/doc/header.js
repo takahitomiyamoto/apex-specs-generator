@@ -2,18 +2,37 @@
  * @name doc/header.js
  */
 import {
-  REGEXP_HEADER_DESCRIPTION,
-  REGEXP_HEADER_OTHERS,
-  REGEXP_HEADER_OTHERS_KEY_PREFIX,
-  REGEXP_HEADER_OTHERS_KEY_SUFFIX,
-  REGEXP_HEADER_CLASS_SIGNATURE,
-  REGEXP_HEADER_TRIGGER_SIGNATURE,
-  REGEXP_HEADER_SIGNATURE_SUFFIX,
+  REGEXP_HEADER_TAGS_START,
+  REGEXP_HEADER_SIGNATURE_CLASS,
+  REGEXP_HEADER_SIGNATURE_END,
+  REGEXP_HEADER_SIGNATURE_TRIGGER,
+  REGEXP_HEADER_TAGS,
   TABLE_HEADER_HEADER
 } from './config';
-import { fetchTag, fetchTagsHeader, fetchSignatureHeader } from './common';
+import { getAnnotations } from './common';
 import { createHeaderAreaApexClass } from './apex-class';
 import { createHeaderAreaTrigger } from './apex-trigger';
+
+/**
+ * @description _createTableRowsHeader
+ * @param {*} params
+ */
+export const _createTableRowsHeader = (params) => {
+  return [
+    [`${params.namespace}`, `${params.manageableState}`, `${params.apiVersion}`]
+  ];
+};
+
+/**
+ * @description _createTableRowsApexDoc
+ * @param {*} item
+ */
+const _createTableRowsApexDoc = (item) => {
+  const descriptionTag = item.tags.filter((tag) => {
+    return 'description' === tag.key;
+  })[0];
+  return [[`${descriptionTag.value}`]];
+};
 
 /**
  * @description _createTableHeader
@@ -22,33 +41,35 @@ import { createHeaderAreaTrigger } from './apex-trigger';
 const _createTableHeader = (params) => {
   return {
     headers: TABLE_HEADER_HEADER,
-    rows: [
-      [
-        `${params.namespace}`,
-        `${params.manageableState}`,
-        `${params.apiVersion}`
-      ]
-    ]
+    rows: _createTableRowsHeader(params)
   };
 };
 
 /**
- * @description _createTableRowsApexDoc
- * @param {*} body
+ * @description _createListApexDoc
+ * @param {*} item
  */
-const _createTableRowsApexDoc = (body) => {
-  return [[`${body.header.description}`]];
+const _createListApexDoc = (item) => {
+  return item.tags.map((tag) => {
+    return `**\`${tag.key}\`** : ${tag.value}`;
+  });
 };
 
 /**
- * @description _createListApexDoc
- * @param {*} body
+ * @description _createCodeContent
+ * @param {*} params
+ * @param {*} header
  */
-const _createListApexDoc = (body) => {
-  const tags = body.header.others;
-  return tags.map((tag) => {
-    return `**\`${tag.key}\`** : ${tag.value}`;
-  });
+const _createCodeContent = (params, header) => {
+  const content = [];
+
+  if (params.annotations) {
+    const annotations = getAnnotations(params.annotations);
+    content.push(annotations);
+  }
+
+  content.push(header.signature);
+  return content;
 };
 
 /**
@@ -57,31 +78,46 @@ const _createListApexDoc = (body) => {
  * @param {*} regexp
  */
 const _parseBodyHeader = (body, regexp) => {
-  body = body.replace(/\r\n/, /\n/);
-  const arrayBody = body.split(/\n/);
+  body = body.replace(/\r\n/g, '\n');
+  const arrayBody = body.split('\n');
+  const reversedBody = arrayBody.reverse();
 
-  const description = fetchTag(arrayBody, regexp.regexpDescription);
+  const headerBody = body.match(regexp.regexpSignature);
 
-  const others = fetchTagsHeader({
-    body: arrayBody,
-    regexpValue: regexp.regexpOthers,
-    regexpKeyPrefix: regexp.regexpOthersKeyPrefix,
-    regexpKeySuffix: regexp.regexpOthersKeySuffix
-  });
+  let name;
+  let signature = '';
 
-  const signature = fetchSignatureHeader({
-    body: arrayBody,
-    regexpValue: regexp.regexpSignature,
-    regexpKeyPrefix: '',
-    regexpKeySuffix: regexp.regexpSignatureSuffix
+  name = headerBody[0].replace(regexp.regexpSignature, '$1');
+  signature = headerBody[0]
+    .replace(regexp.regexpSignatureEnd, '')
+    .replace(/\n/g, '')
+    .replace(/\s[\s]+/g, ' ')
+    .replace(/\(\s/, '(');
+
+  const header = [];
+  let tags = [];
+
+  reversedBody.forEach((line) => {
+    if (regexp.regexpTags.test(line)) {
+      tags.push({
+        key: line.replace(regexp.regexpTags, '$1'),
+        value: line.replace(regexp.regexpTags, '$2')
+      });
+    }
+    if (regexp.regexpTagsStart.test(line)) {
+      header.push({
+        name: name,
+        signature: signature,
+        tags: tags.reverse()
+      });
+      name = '';
+      signature = '';
+      tags = [];
+    }
   });
 
   return {
-    header: {
-      description: description,
-      others: others,
-      signature: signature
-    }
+    header: header
   };
 };
 
@@ -132,7 +168,8 @@ export const createHeaderArea = (params) => {
         {
           createTableHeader: _createTableHeader,
           createTableRowsApexDoc: _createTableRowsApexDoc,
-          createListApexDoc: _createListApexDoc
+          createListApexDoc: _createListApexDoc,
+          createCodeContent: _createCodeContent
         }
       );
     case 'ApexTrigger':
@@ -155,7 +192,8 @@ export const createHeaderArea = (params) => {
         {
           createTableHeader: _createTableHeader,
           createTableRowsApexDoc: _createTableRowsApexDoc,
-          createListApexDoc: _createListApexDoc
+          createListApexDoc: _createListApexDoc,
+          createCodeContent: _createCodeContent
         }
       );
     default:
@@ -170,14 +208,12 @@ export const createHeaderArea = (params) => {
  */
 export const parseBodyHeader = (body, type) => {
   return _parseBodyHeader(body, {
-    regexpDescription: REGEXP_HEADER_DESCRIPTION,
-    regexpOthers: REGEXP_HEADER_OTHERS,
-    regexpOthersKeyPrefix: REGEXP_HEADER_OTHERS_KEY_PREFIX,
-    regexpOthersKeySuffix: REGEXP_HEADER_OTHERS_KEY_SUFFIX,
     regexpSignature:
       'ApexClass' === type
-        ? REGEXP_HEADER_CLASS_SIGNATURE
-        : REGEXP_HEADER_TRIGGER_SIGNATURE,
-    regexpSignatureSuffix: REGEXP_HEADER_SIGNATURE_SUFFIX
+        ? REGEXP_HEADER_SIGNATURE_CLASS
+        : REGEXP_HEADER_SIGNATURE_TRIGGER,
+    regexpSignatureEnd: REGEXP_HEADER_SIGNATURE_END,
+    regexpTags: REGEXP_HEADER_TAGS,
+    regexpTagsStart: REGEXP_HEADER_TAGS_START
   });
 };
