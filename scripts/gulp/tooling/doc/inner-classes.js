@@ -109,8 +109,8 @@ export const createInnerClassesArea = (params) => {
  */
 const _parseBodyInnerClass = (body, regexp) => {
   body = body.replace(/\r\n/g, '\n');
-
   const innerClassRaws = body.match(regexp.innerClass);
+
   const innerClass = !innerClassRaws
     ? []
     : innerClassRaws.map((raw) => {
@@ -131,6 +131,9 @@ const _parseBodyInnerClass = (body, regexp) => {
             .replace(regexp.signatureEnd, '')
         };
       });
+
+  console.log(`\n## Inner Class`);
+  console.log(JSON.stringify(innerClass));
 
   return {
     innerClass: innerClass
