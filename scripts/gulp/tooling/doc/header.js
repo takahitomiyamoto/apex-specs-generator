@@ -24,6 +24,18 @@ export const _createTableRowsHeader = (params) => {
 };
 
 /**
+ * @description _createTableHeader
+ * @param {*} params
+ * @param {*} funcs
+ */
+const _createTableHeader = (params, funcs) => {
+  return {
+    headers: TABLE_HEADER_HEADER,
+    rows: funcs.createTableRowsHeader(params)
+  };
+};
+
+/**
  * @description _createTableRowsApexDoc
  * @param {*} item
  */
@@ -32,17 +44,6 @@ const _createTableRowsApexDoc = (item) => {
     return 'description' === tag.key;
   })[0];
   return [[`${descriptionTag.value}`]];
-};
-
-/**
- * @description _createTableHeader
- * @param {*} params
- */
-const _createTableHeader = (params) => {
-  return {
-    headers: TABLE_HEADER_HEADER,
-    rows: _createTableRowsHeader(params)
-  };
 };
 
 /**
@@ -74,8 +75,8 @@ const _createCodeContent = (header) => {
  */
 const _parseBodyHeader = (body, regexp) => {
   body = body.replace(/\r\n/g, '\n');
-
   const headerRaws = body.match(regexp.header);
+
   const header = !headerRaws
     ? []
     : headerRaws.map((raw) => {
@@ -94,11 +95,11 @@ const _parseBodyHeader = (body, regexp) => {
             .replace(regexp.tagsArea, '')
             .replace(regexp.signatureStart, '')
             .replace(regexp.signatureEnd, '')
-            .replace(/\n/g, '')
-            .replace(/\s+/g, ' ')
-            .replace(/\(\s/g, '(')
         };
       });
+
+  console.log(`\n## Header`);
+  console.log(JSON.stringify(header));
 
   return {
     header: header
@@ -151,6 +152,7 @@ export const createHeaderArea = (params) => {
         },
         {
           createTableHeader: _createTableHeader,
+          createTableRowsHeader: _createTableRowsHeader,
           createTableRowsApexDoc: _createTableRowsApexDoc,
           createListApexDoc: _createListApexDoc,
           createCodeContent: _createCodeContent
@@ -175,6 +177,7 @@ export const createHeaderArea = (params) => {
         },
         {
           createTableHeader: _createTableHeader,
+          createTableRowsHeader: _createTableRowsHeader,
           createTableRowsApexDoc: _createTableRowsApexDoc,
           createListApexDoc: _createListApexDoc,
           createCodeContent: _createCodeContent
