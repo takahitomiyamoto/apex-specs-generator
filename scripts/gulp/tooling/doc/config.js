@@ -3,34 +3,76 @@
  */
 import { getApexClasses, getApexTriggers } from '../../common/lib';
 
-export const HEADERS_CLASS_TABLE = [
+const REGEXP_CLASS = `\\/\\*+\n([\\w\\s\n*()@<>,.:]+)\\s+\\*\\/\n[\\w\\s\n()@=]*[\\w\\s]+\\sclass\\s(\\w+)\\s`;
+const REGEXP_CLASS_OPTIONS = `(extends\\s[\\w<>]+\\s|implements\\s.+\\s)*`;
+const REGEXP_INNER_CLASS_START = `\n\\s+`;
+const REGEXP_TAGS = `\\s\\*\\s@(\\w+)\\s(.+)`;
+const REGEXP_TAGS_AREA = `\\/\\*+\n([\\w\\s\n*()@<>,.:]+)\\s+\\*\\/`;
+const REGEXP_TRIGGER = `\\/\\*+\n([\\w\\s\n*()@<>,.:]+)\\s+\\*\\/\n[\\w\\s\n()=@]*trigger\\s(\\w+)\\son\\s\\w+\\([\\w\\s\n,]+\\)`;
+const REGEXP_SIGNATURE_END = `\\s\\{`;
+
+export const REGEXP_HEADER_CLASS = new RegExp(
+  `^${REGEXP_CLASS}${REGEXP_CLASS_OPTIONS}\\{`,
+  'g'
+);
+export const REGEXP_HEADER_SIGNATURE_END = new RegExp(
+  `${REGEXP_SIGNATURE_END}$`
+);
+export const REGEXP_HEADER_SIGNATURE_START = new RegExp(`^\n`);
+export const REGEXP_HEADER_TAGS = new RegExp(REGEXP_TAGS, 'g');
+export const REGEXP_HEADER_TAGS_AREA = new RegExp(REGEXP_TAGS_AREA);
+export const REGEXP_HEADER_TRIGGER = new RegExp(
+  `^${REGEXP_TRIGGER}${REGEXP_SIGNATURE_END}`,
+  'g'
+);
+export const REGEXP_INNER_CLASS = new RegExp(
+  `${REGEXP_INNER_CLASS_START}${REGEXP_CLASS}${REGEXP_CLASS_OPTIONS}\\{`,
+  'g'
+);
+export const REGEXP_INNER_CLASS_SIGNATURE_END = new RegExp(
+  `${REGEXP_SIGNATURE_END}$`
+);
+export const REGEXP_INNER_CLASS_SIGNATURE_START = /\n\s+/;
+export const REGEXP_INNER_CLASS_TAGS = new RegExp(REGEXP_TAGS, 'g');
+export const REGEXP_INNER_CLASS_TAGS_AREA = new RegExp(
+  `${REGEXP_INNER_CLASS_START}${REGEXP_TAGS_AREA}`,
+  'g'
+);
+
+export const TABLE_HEADER_CLASS = [
   'Annotation',
   'Modifier',
   'Name',
   'Parent Class',
   'Interfaces'
 ];
-export const HEADERS_CONSTRUCTORS_TABLE = ['Modifier', 'Name'];
-export const HEADERS_EXTERNAL_REFERENCES_TABLE = [
+export const TABLE_HEADER_CONSTRUCTORS = ['Modifier', 'Name'];
+export const TABLE_HEADER_EXTERNAL_REFERENCES = [
   'Namespace',
   'Name',
   'Variables',
   'Methods'
 ];
-export const HEADERS_HEADER_TABLE = [
+export const TABLE_HEADER_HEADER = [
   'Namespace',
   'Manageable State',
   'API Version'
 ];
-export const HEADERS_METHODS_TABLE = ['Annotation', 'Modifier', 'Type', 'Name'];
-export const HEADERS_PARAMETERS_TABLE = ['Type', 'Name'];
-export const HEADERS_PROPERTIES_TABLE = [
+export const TABLE_HEADER_APEX_DOC = ['Description'];
+export const TABLE_HEADER_METHODS = [
+  'Annotation',
+  'Modifier',
+  'Return Type',
+  'Name'
+];
+export const TABLE_HEADER_PARAMETERS = ['Type', 'Name'];
+export const TABLE_HEADER_PROPERTIES = [
   'Annotations',
   'Modifier',
   'Type',
   'Name'
 ];
-export const HEADERS_TRIGGER_TABLE = [
+export const TABLE_HEADER_TRIGGER = [
   'Before Insert',
   'Before Update',
   'Before Delete',

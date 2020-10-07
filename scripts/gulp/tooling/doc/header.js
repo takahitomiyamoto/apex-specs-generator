@@ -30,8 +30,10 @@ export const _createTableRowsHeader = (params) => {
  */
 const _createTableHeader = (params, funcs) => {
   return {
-    headers: TABLE_HEADER_HEADER,
-    rows: funcs.createTableRowsHeader(params)
+    table: {
+      headers: TABLE_HEADER_HEADER,
+      rows: funcs.createTableRows(params)
+    }
   };
 };
 
@@ -152,7 +154,7 @@ export const createHeaderArea = (params) => {
         },
         {
           createTableHeader: _createTableHeader,
-          createTableRowsHeader: _createTableRowsHeader,
+          createTableRows: _createTableRowsHeader,
           createTableRowsApexDoc: _createTableRowsApexDoc,
           createListApexDoc: _createListApexDoc,
           createCodeContent: _createCodeContent
@@ -177,7 +179,7 @@ export const createHeaderArea = (params) => {
         },
         {
           createTableHeader: _createTableHeader,
-          createTableRowsHeader: _createTableRowsHeader,
+          createTableRows: _createTableRowsHeader,
           createTableRowsApexDoc: _createTableRowsApexDoc,
           createListApexDoc: _createListApexDoc,
           createCodeContent: _createCodeContent

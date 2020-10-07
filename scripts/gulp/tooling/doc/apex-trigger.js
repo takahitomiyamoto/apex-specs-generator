@@ -8,7 +8,7 @@ import { createApexDocArea, createCode } from './common';
  * @description _createTableRowsTrigger
  * @param {*} params
  */
-export const _createTableRowsTrigger = (params) => {
+const _createTableRowsTrigger = (params) => {
   return [
     [
       `${params.usageBeforeInsert ? 'Y' : ''}`,
@@ -25,11 +25,14 @@ export const _createTableRowsTrigger = (params) => {
 /**
  * @description _createTableTrigger
  * @param {*} params
+ * @param {*} func
  */
-const _createTableTrigger = (params) => {
+const _createTableTrigger = (params, func) => {
   return {
-    headers: TABLE_HEADER_TRIGGER,
-    rows: _createTableRowsTrigger(params)
+    table: {
+      headers: TABLE_HEADER_TRIGGER,
+      rows: func.createTableRows(params)
+    }
   };
 };
 
@@ -46,15 +49,13 @@ export const createHeaderAreaTrigger = (params, funcs) => {
   })[0];
 
   return [
-    {
-      table: funcs.createTableHeader(params)
-    },
-    {
-      table: _createTableTrigger(params)
-    },
+    funcs.createTableHeader(params, {
+      createTableRows: funcs.createTableRows
+    }),
+    _createTableTrigger(params, {
+      createTableRows: _createTableRowsTrigger
+    }),
     createApexDocArea(item, funcs),
-    {
-      code: createCode(item, funcs.createCodeContent)
-    }
+    createCode(item, funcs.createCodeContent)
   ];
 };

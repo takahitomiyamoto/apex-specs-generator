@@ -10,7 +10,8 @@ import {
   REGEXP_INNER_CLASS_TAGS,
   TITLE_INNER_CLASSES
 } from './config';
-import { createApexDocArea, createCode, createTableClass } from './common';
+import { createApexDocArea, createCode } from './common';
+import { createTableClass, createTableRowsClass } from './apex-class';
 import { createInnerPropertiesArea } from './inner-properties';
 
 /**
@@ -70,17 +71,15 @@ const _createInnerClasses = (params) => {
 
     return [
       { h3: inne.name },
-      {
-        table: createTableClass(innerClass)
-      },
+      createTableClass(innerClass, {
+        createTableRows: createTableRowsClass
+      }),
       createInnerPropertiesArea(inne.properties),
       createApexDocArea(item, {
         createTableRowsApexDoc: _createTableRowsApexDoc,
         createListApexDoc: _createListApexDoc
       }),
-      {
-        code: createCode(item, _createCodeContentClass)
-      }
+      createCode(item, _createCodeContentClass)
     ];
   });
 };
