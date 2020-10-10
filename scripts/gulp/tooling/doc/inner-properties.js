@@ -1,8 +1,8 @@
 /**
  * @name doc/inner-properties.js
  */
-import { TABLE_HEADER_PROPERTIES, TITLE_PROPERTIES } from './config';
-import { getAnnotations, getModifiers } from './common';
+import { TITLE_PROPERTIES } from './config';
+import { createTableProperties, createTableRowsProperty } from './properties';
 
 /**
  * @description _createTableRowsInnerProperties
@@ -10,24 +10,8 @@ import { getAnnotations, getModifiers } from './common';
  */
 const _createTableRowsInnerProperties = (params) => {
   return params.map((inne) => {
-    const annotations = getAnnotations(inne.annotations);
-    const modifiers = getModifiers(inne.modifiers);
-    return [`${annotations}`, `${modifiers}`, `${inne.type}`, `${inne.name}`];
+    return createTableRowsProperty(inne)[0];
   });
-};
-
-/**
- * @description _createTableInnerProperties
- * @param {*} params
- * @param {*} funcs
- */
-const _createTableInnerProperties = (params, funcs) => {
-  return {
-    table: {
-      headers: TABLE_HEADER_PROPERTIES,
-      rows: funcs.createTableRows(params)
-    }
-  };
 };
 
 /**
@@ -43,7 +27,7 @@ export const createInnerPropertiesArea = (params) => {
   }
 
   result.push(
-    _createTableInnerProperties(params, {
+    createTableProperties(params, {
       createTableRows: _createTableRowsInnerProperties
     })
   );

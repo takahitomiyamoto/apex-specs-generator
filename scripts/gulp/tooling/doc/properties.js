@@ -34,10 +34,10 @@ const _createListApexDoc = (item) => {
 };
 
 /**
- * @description _createTableRowsProperty
+ * @description createTableRowsProperty
  * @param {*} params
  */
-const _createTableRowsProperty = (params) => {
+export const createTableRowsProperty = (params) => {
   const annotations = getAnnotations(params.annotations);
   const modifiers = getModifiers(params.modifiers);
   return [
@@ -46,11 +46,11 @@ const _createTableRowsProperty = (params) => {
 };
 
 /**
- * @description _createTableProperty
+ * @description createTableProperties
  * @param {*} params
  * @param {*} funcs
  */
-const _createTableProperty = (params, funcs) => {
+export const createTableProperties = (params, funcs) => {
   return {
     table: {
       headers: TABLE_HEADER_PROPERTIES,
@@ -87,8 +87,8 @@ const _createProperties = (params) => {
     result.push([
       { h3: prop.name },
       createTableApexDoc(item),
-      _createTableProperty(prop, {
-        createTableRows: _createTableRowsProperty
+      createTableProperties(prop, {
+        createTableRows: createTableRowsProperty
       })
     ]);
 

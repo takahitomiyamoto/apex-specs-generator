@@ -33,6 +33,7 @@ export const createTableRowsClass = (params) => {
 /**
  * @description createTableClass
  * @param {*} params
+ * @param {*} funcs
  */
 export const createTableClass = (params, funcs) => {
   return {

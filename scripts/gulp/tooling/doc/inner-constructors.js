@@ -1,8 +1,11 @@
 /**
  * @name doc/inner-constructors.js
  */
-import { TABLE_HEADER_CONSTRUCTORS, TITLE_CONSTRUCTORS } from './config';
-import { getAnnotations, getModifiers } from './common';
+import { TITLE_CONSTRUCTORS } from './config';
+import {
+  createTableConstructors,
+  createTableRowsConstructors
+} from './constructors';
 
 /**
  * @description _createTableRowsInnerConstructors
@@ -10,24 +13,8 @@ import { getAnnotations, getModifiers } from './common';
  */
 const _createTableRowsInnerConstructors = (params) => {
   return params.map((cons) => {
-    const annotations = getAnnotations(cons.annotations);
-    const modifiers = getModifiers(cons.modifiers);
-    return [`${annotations}`, `${modifiers}`, `${cons.name}`];
+    return createTableRowsConstructors(cons)[0];
   });
-};
-
-/**
- * @description _createTableInnerProperties
- * @param {*} params
- * @param {*} funcs
- */
-const _createTableInnerConstructors = (params, funcs) => {
-  return {
-    table: {
-      headers: TABLE_HEADER_CONSTRUCTORS,
-      rows: funcs.createTableRows(params)
-    }
-  };
 };
 
 /**
@@ -43,7 +30,7 @@ export const createInnerConstructorsArea = (params) => {
   }
 
   result.push(
-    _createTableInnerConstructors(params, {
+    createTableConstructors(params, {
       createTableRows: _createTableRowsInnerConstructors
     })
   );

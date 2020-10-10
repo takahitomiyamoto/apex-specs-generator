@@ -9,17 +9,14 @@ import {
 import { getMethods, getVariables } from './common';
 
 /**
- * @description createTableRowsExternalReferences
+ * @description _createTableRowsExternalReferences
  * @param {*} params
  */
-const createTableRowsExternalReferences = (params) => {
+const _createTableRowsExternalReferences = (params) => {
   return params.map((exte) => {
-    return [
-      `${exte.namespace}`,
-      `${exte.name}`,
-      `${getVariables(exte.variables)}`,
-      `${getMethods(exte.methods)}`
-    ];
+    const variables = getVariables(exte.variables);
+    const methods = getMethods(exte.methods);
+    return [`${exte.namespace}`, `${exte.name}`, `${variables}`, `${methods}`];
   });
 };
 
@@ -27,10 +24,12 @@ const createTableRowsExternalReferences = (params) => {
  * @description createTableExternalReferences
  * @param {*} params
  */
-const createTableExternalReferences = (params) => {
+export const createTableExternalReferences = (params) => {
   return {
-    headers: TABLE_HEADER_EXTERNAL_REFERENCES,
-    rows: createTableRowsExternalReferences(params)
+    table: {
+      headers: TABLE_HEADER_EXTERNAL_REFERENCES,
+      rows: _createTableRowsExternalReferences(params)
+    }
   };
 };
 
@@ -46,9 +45,7 @@ export const createExternalReferencesArea = (params) => {
   if (!externalReferences.length) {
     result.push({ p: NOT_APPLICABLE });
   } else {
-    result.push({
-      table: createTableExternalReferences(externalReferences)
-    });
+    result.push(createTableExternalReferences(externalReferences));
   }
 
   return result;
