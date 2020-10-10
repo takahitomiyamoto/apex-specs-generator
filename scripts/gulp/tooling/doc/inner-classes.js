@@ -1,6 +1,7 @@
 /**
  * @name doc/inner-classes.js
  */
+import { createApexDocArea, createCode, extractApexDoc } from './common';
 import {
   NOT_APPLICABLE,
   REGEXP_INNER_CLASS_TAGS_AREA,
@@ -10,7 +11,6 @@ import {
   REGEXP_INNER_CLASS_TAGS,
   TITLE_INNER_CLASSES
 } from './config';
-import { createApexDocArea, createCode } from './common';
 import { createTableClass, createTableRowsClass } from './apex-class';
 import { createInnerPropertiesArea } from './inner-properties';
 
@@ -65,7 +65,7 @@ const _createInnerClasses = (params) => {
       interfaces: inne.interfaces
     };
 
-    const item = body.innerClass.filter((i) => {
+    const item = body.innerClasses.filter((i) => {
       return inne.name === i.name;
     })[0];
 
@@ -102,50 +102,27 @@ export const createInnerClassesArea = (params) => {
 };
 
 /**
- * @description _parseBodyInnerClass
+ * @description _parseBodyInnerClasses
  * @param {*} body
  * @param {*} regexp
  */
-const _parseBodyInnerClass = (body, regexp) => {
-  body = body.replace(/\r\n/g, '\n');
-  const innerClassRaws = body.match(regexp.innerClass);
-
-  const innerClass = !innerClassRaws
-    ? []
-    : innerClassRaws.map((raw) => {
-        return {
-          tags: raw
-            .replace(regexp.innerClass, '$1')
-            .match(regexp.tags)
-            .map((tag) => {
-              return {
-                key: tag.replace(regexp.tags, '$1'),
-                value: tag.replace(regexp.tags, '$2')
-              };
-            }),
-          name: raw.replace(regexp.innerClass, '$2'),
-          signature: raw
-            .replace(regexp.tagsArea, '')
-            .replace(regexp.signatureStart, '')
-            .replace(regexp.signatureEnd, '')
-        };
-      });
-
+const _parseBodyInnerClasses = (body, regexp) => {
+  const innerClasses = extractApexDoc(body, regexp);
   console.log(`\n## Inner Class`);
-  console.log(JSON.stringify(innerClass));
+  console.log(JSON.stringify(innerClasses));
 
   return {
-    innerClass: innerClass
+    innerClasses: innerClasses
   };
 };
 
 /**
- * @description parseBodyInnerClass
+ * @description parseBodyInnerClasses
  * @param {*} body
  */
-export const parseBodyInnerClass = (body) => {
-  return _parseBodyInnerClass(body, {
-    innerClass: REGEXP_INNER_CLASS,
+export const parseBodyInnerClasses = (body) => {
+  return _parseBodyInnerClasses(body, {
+    target: REGEXP_INNER_CLASS,
     signatureStart: REGEXP_INNER_CLASS_SIGNATURE_START,
     signatureEnd: REGEXP_INNER_CLASS_SIGNATURE_END,
     tags: REGEXP_INNER_CLASS_TAGS,

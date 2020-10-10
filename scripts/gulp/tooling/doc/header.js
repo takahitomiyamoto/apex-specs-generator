@@ -1,6 +1,7 @@
 /**
  * @name doc/header.js
  */
+import { extractApexDoc } from './common';
 import {
   REGEXP_HEADER_CLASS,
   REGEXP_HEADER_TRIGGER,
@@ -76,30 +77,7 @@ const _createCodeContent = (header) => {
  * @param {*} regexp
  */
 const _parseBodyHeader = (body, regexp) => {
-  body = body.replace(/\r\n/g, '\n');
-  const headerRaws = body.match(regexp.header);
-
-  const header = !headerRaws
-    ? []
-    : headerRaws.map((raw) => {
-        return {
-          tags: raw
-            .replace(regexp.header, '$1')
-            .match(regexp.tags)
-            .map((tag) => {
-              return {
-                key: tag.replace(regexp.tags, '$1'),
-                value: tag.replace(regexp.tags, '$2')
-              };
-            }),
-          name: raw.replace(regexp.header, '$2'),
-          signature: raw
-            .replace(regexp.tagsArea, '')
-            .replace(regexp.signatureStart, '')
-            .replace(regexp.signatureEnd, '')
-        };
-      });
-
+  const header = extractApexDoc(body, regexp);
   console.log(`\n## Header`);
   console.log(JSON.stringify(header));
 
@@ -197,7 +175,7 @@ export const createHeaderArea = (params) => {
  */
 export const parseBodyHeader = (body, type) => {
   return _parseBodyHeader(body, {
-    header: 'ApexClass' === type ? REGEXP_HEADER_CLASS : REGEXP_HEADER_TRIGGER,
+    target: 'ApexClass' === type ? REGEXP_HEADER_CLASS : REGEXP_HEADER_TRIGGER,
     signatureStart: REGEXP_HEADER_SIGNATURE_START,
     signatureEnd: REGEXP_HEADER_SIGNATURE_END,
     tags: REGEXP_HEADER_TAGS,
