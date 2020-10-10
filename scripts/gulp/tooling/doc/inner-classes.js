@@ -1,7 +1,7 @@
 /**
  * @name doc/inner-classes.js
  */
-import { createApexDocArea, createCode, extractApexDoc } from './common';
+import { createTableApexDoc, createCode, extractApexDoc } from './common';
 import {
   NOT_APPLICABLE,
   REGEXP_INNER_CLASS_TAGS_AREA,
@@ -15,25 +15,15 @@ import { createTableClass, createTableRowsClass } from './apex-class';
 import { createInnerPropertiesArea } from './inner-properties';
 
 /**
- * @description _createTableRowsApexDoc
- * @param {*} item
- */
-const _createTableRowsApexDoc = (item) => {
-  const descriptionTag = item.tags.filter((tag) => {
-    return 'description' === tag.key;
-  })[0];
-  return [[`${descriptionTag.value}`]];
-};
-
-/**
  * @description _createListApexDoc
  * @param {*} item
  */
 const _createListApexDoc = (item) => {
-  const tags = item.tags;
-  return tags.map((tag) => {
-    return `**\`${tag.key}\`** : ${tag.value}`;
-  });
+  return {
+    ul: item.tags.map((tag) => {
+      return `**\`${tag.key}\`** : ${tag.value}`;
+    })
+  };
 };
 
 /**
@@ -65,22 +55,33 @@ const _createInnerClasses = (params) => {
       interfaces: inne.interfaces
     };
 
-    const item = body.innerClasses.filter((i) => {
+    let item = body.innerClasses.filter((i) => {
       return inne.name === i.name;
-    })[0];
+    });
 
-    return [
+    const result = [];
+
+    result.push([
       { h3: inne.name },
+      createTableApexDoc(item),
       createTableClass(innerClass, {
         createTableRows: createTableRowsClass
       }),
-      createInnerPropertiesArea(inne.properties),
-      createApexDocArea(item, {
-        createTableRowsApexDoc: _createTableRowsApexDoc,
-        createListApexDoc: _createListApexDoc
-      }),
+      createInnerPropertiesArea(inne.properties)
+    ]);
+
+    if (!item.length) {
+      return result;
+    }
+
+    item = item[0];
+
+    result.push([
+      _createListApexDoc(item),
       createCode(item, _createCodeContentClass)
-    ];
+    ]);
+
+    return result;
   });
 };
 
