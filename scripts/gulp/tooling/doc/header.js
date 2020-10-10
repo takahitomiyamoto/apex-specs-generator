@@ -3,12 +3,13 @@
  */
 import { extractApexDoc } from './common';
 import {
+  REGEXP_ANNOTATIONS_END_HEADER,
   REGEXP_HEADER_CLASS,
   REGEXP_HEADER_TRIGGER,
-  REGEXP_HEADER_SIGNATURE_START,
-  REGEXP_HEADER_SIGNATURE_END,
-  REGEXP_HEADER_TAGS,
-  REGEXP_HEADER_TAGS_AREA,
+  REGEXP_SIGNATURE_END_HEADER,
+  REGEXP_SIGNATURE_START_HEADER,
+  REGEXP_TAGS_AREA_HEADER,
+  REGEXP_TAGS_HEADER,
   TABLE_HEADER_HEADER
 } from './config';
 import { createHeaderAreaApexClass } from './apex-class';
@@ -39,24 +40,15 @@ const _createTableHeader = (params, funcs) => {
 };
 
 /**
- * @description _createTableRowsApexDoc
- * @param {*} item
- */
-const _createTableRowsApexDoc = (item) => {
-  const descriptionTag = item.tags.filter((tag) => {
-    return 'description' === tag.key;
-  })[0];
-  return [[`${descriptionTag.value}`]];
-};
-
-/**
  * @description _createListApexDoc
  * @param {*} item
  */
 const _createListApexDoc = (item) => {
-  return item.tags.map((tag) => {
-    return `**\`${tag.key}\`** : ${tag.value}`;
-  });
+  return {
+    ul: item.tags.map((tag) => {
+      return `**\`${tag.key}\`** : ${tag.value}`;
+    })
+  };
 };
 
 /**
@@ -133,7 +125,6 @@ export const createHeaderArea = (params) => {
         {
           createTableHeader: _createTableHeader,
           createTableRows: _createTableRowsHeader,
-          createTableRowsApexDoc: _createTableRowsApexDoc,
           createListApexDoc: _createListApexDoc,
           createCodeContent: _createCodeContent
         }
@@ -158,7 +149,6 @@ export const createHeaderArea = (params) => {
         {
           createTableHeader: _createTableHeader,
           createTableRows: _createTableRowsHeader,
-          createTableRowsApexDoc: _createTableRowsApexDoc,
           createListApexDoc: _createListApexDoc,
           createCodeContent: _createCodeContent
         }
@@ -176,9 +166,10 @@ export const createHeaderArea = (params) => {
 export const parseBodyHeader = (body, type) => {
   return _parseBodyHeader(body, {
     target: 'ApexClass' === type ? REGEXP_HEADER_CLASS : REGEXP_HEADER_TRIGGER,
-    signatureStart: REGEXP_HEADER_SIGNATURE_START,
-    signatureEnd: REGEXP_HEADER_SIGNATURE_END,
-    tags: REGEXP_HEADER_TAGS,
-    tagsArea: REGEXP_HEADER_TAGS_AREA
+    tags: REGEXP_TAGS_HEADER,
+    tagsArea: REGEXP_TAGS_AREA_HEADER,
+    annotationsEnd: REGEXP_ANNOTATIONS_END_HEADER,
+    signatureStart: REGEXP_SIGNATURE_START_HEADER,
+    signatureEnd: REGEXP_SIGNATURE_END_HEADER
   });
 };

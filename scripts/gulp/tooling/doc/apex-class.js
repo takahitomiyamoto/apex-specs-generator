@@ -3,8 +3,8 @@
  */
 import { TABLE_HEADER_CLASS } from './config';
 import {
-  createApexDocArea,
   createCode,
+  createTableApexDoc,
   getAnnotations,
   getModifiers,
   getInterfaceNames
@@ -51,18 +51,32 @@ export const createTableClass = (params, funcs) => {
 export const createHeaderAreaApexClass = (params, funcs) => {
   const body = params.body;
 
-  const item = body.header.filter((i) => {
+  let item = body.header.filter((i) => {
     return params.name === i.name;
-  })[0];
+  });
 
-  return [
+  const result = [];
+
+  result.push([
+    createTableApexDoc(item),
     funcs.createTableHeader(params, {
       createTableRows: funcs.createTableRows
     }),
     createTableClass(params, {
       createTableRows: createTableRowsClass
-    }),
-    createApexDocArea(item, funcs),
+    })
+  ]);
+
+  if (!item.length) {
+    return result;
+  }
+
+  item = item[0];
+
+  result.push([
+    funcs.createListApexDoc(item),
     createCode(item, funcs.createCodeContent)
-  ];
+  ]);
+
+  return result;
 };
