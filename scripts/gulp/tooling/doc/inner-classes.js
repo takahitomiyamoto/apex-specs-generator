@@ -1,7 +1,7 @@
 /**
  * @name doc/inner-classes.js
  */
-import { createTableApexDoc, createCode, extractApexDoc } from './common';
+import { createCode, createTableApexDoc, extractApexDoc } from './common';
 import {
   NOT_APPLICABLE,
   REGEXP_ANNOTATIONS_END_INNER_CLASS,
@@ -13,6 +13,8 @@ import {
   TITLE_INNER_CLASSES
 } from './config';
 import { createTableClass, createTableRowsClass } from './apex-class';
+import { createInnerConstructorsArea } from './inner-constructors';
+import { createInnerExternalReferencesArea } from './inner-external-references';
 import { createInnerPropertiesArea } from './inner-properties';
 
 /**
@@ -66,8 +68,7 @@ const _createInnerClasses = (params) => {
       createTableApexDoc(item),
       createTableClass(innerClass, {
         createTableRows: createTableRowsClass
-      }),
-      createInnerPropertiesArea(inne.properties)
+      })
     ]);
 
     if (!item.length) {
@@ -80,6 +81,10 @@ const _createInnerClasses = (params) => {
       _createListApexDoc(item),
       createCode(item, _createCodeContentClass)
     ]);
+
+    result.push([createInnerExternalReferencesArea(inne.externalReferences)]);
+    result.push([createInnerConstructorsArea(inne.constructors)]);
+    result.push([createInnerPropertiesArea(inne.properties)]);
 
     return result;
   });

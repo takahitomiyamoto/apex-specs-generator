@@ -1,36 +1,32 @@
 /**
  * @name doc/inner-properties.js
  */
-import {
-  NOT_APPLICABLE,
-  HEADERS_PROPERTIES_TABLE,
-  TITLE_PROPERTIES
-} from './config';
+import { TABLE_HEADER_PROPERTIES, TITLE_PROPERTIES } from './config';
 import { getAnnotations, getModifiers } from './common';
 
 /**
- * @description getInnerPropertiesTableRows
+ * @description _createTableRowsInnerProperties
  * @param {*} params
  */
-const getInnerPropertiesTableRows = (params) => {
+const _createTableRowsInnerProperties = (params) => {
   return params.map((inne) => {
-    return [
-      `${getAnnotations(inne.annotations)}`,
-      `${getModifiers(inne.modifiers)}`,
-      `${inne.type}`,
-      `${inne.name}`
-    ];
+    const annotations = getAnnotations(inne.annotations);
+    const modifiers = getModifiers(inne.modifiers);
+    return [`${annotations}`, `${modifiers}`, `${inne.type}`, `${inne.name}`];
   });
 };
 
 /**
- * @description createInnerPropertiesTable
+ * @description _createTableInnerProperties
  * @param {*} params
+ * @param {*} funcs
  */
-const createInnerPropertiesTable = (params) => {
+const _createTableInnerProperties = (params, funcs) => {
   return {
-    headers: HEADERS_PROPERTIES_TABLE,
-    rows: getInnerPropertiesTableRows(params)
+    table: {
+      headers: TABLE_HEADER_PROPERTIES,
+      rows: funcs.createTableRows(params)
+    }
   };
 };
 
@@ -43,12 +39,14 @@ export const createInnerPropertiesArea = (params) => {
   result.push({ h4: TITLE_PROPERTIES });
 
   if (!params.length) {
-    result.push({ p: NOT_APPLICABLE });
-  } else {
-    result.push({
-      table: createInnerPropertiesTable(params)
-    });
+    return [];
   }
+
+  result.push(
+    _createTableInnerProperties(params, {
+      createTableRows: _createTableRowsInnerProperties
+    })
+  );
 
   return result;
 };
