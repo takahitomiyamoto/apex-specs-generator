@@ -4,11 +4,12 @@
 import { createTableApexDoc, createCode, extractApexDoc } from './common';
 import {
   NOT_APPLICABLE,
-  REGEXP_INNER_CLASS_TAGS_AREA,
+  REGEXP_ANNOTATIONS_END_INNER_CLASS,
   REGEXP_INNER_CLASS,
-  REGEXP_INNER_CLASS_SIGNATURE_START,
-  REGEXP_INNER_CLASS_SIGNATURE_END,
-  REGEXP_INNER_CLASS_TAGS,
+  REGEXP_SIGNATURE_START_INNER_CLASS,
+  REGEXP_SIGNATURE_END_INNER_CLASS,
+  REGEXP_TAGS_INNER_CLASS,
+  REGEXP_TAGS_AREA_INNER_CLASS,
   TITLE_INNER_CLASSES
 } from './config';
 import { createTableClass, createTableRowsClass } from './apex-class';
@@ -33,7 +34,6 @@ const _createListApexDoc = (item) => {
  */
 const _createCodeContentClass = (innerClass) => {
   const content = [];
-
   content.push(innerClass.signature);
   return content;
 };
@@ -124,9 +124,10 @@ const _parseBodyInnerClasses = (body, regexp) => {
 export const parseBodyInnerClasses = (body) => {
   return _parseBodyInnerClasses(body, {
     target: REGEXP_INNER_CLASS,
-    signatureStart: REGEXP_INNER_CLASS_SIGNATURE_START,
-    signatureEnd: REGEXP_INNER_CLASS_SIGNATURE_END,
-    tags: REGEXP_INNER_CLASS_TAGS,
-    tagsArea: REGEXP_INNER_CLASS_TAGS_AREA
+    tags: REGEXP_TAGS_INNER_CLASS,
+    tagsArea: REGEXP_TAGS_AREA_INNER_CLASS,
+    annotationsEnd: REGEXP_ANNOTATIONS_END_INNER_CLASS,
+    signatureStart: REGEXP_SIGNATURE_START_INNER_CLASS,
+    signatureEnd: REGEXP_SIGNATURE_END_INNER_CLASS
   });
 };
