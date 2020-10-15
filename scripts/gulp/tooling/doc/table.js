@@ -3,11 +3,11 @@
  */
 
 /**
- * @description createTableRows
+ * @description _createTableRows
  * @param {*} item
  * @param {*} funcs
  */
-export const createTableRows = (item, funcs) => {
+const _createTableRows = (item, funcs) => {
   const rows = [];
   rows.push(funcs.createTableRow(item));
   return rows;
@@ -21,7 +21,7 @@ export const createTableRows = (item, funcs) => {
  */
 export const createTable = (item, headers, funcs) => {
   const rows = !funcs.createTableRows
-    ? createTableRows(item, funcs)
+    ? _createTableRows(item, funcs)
     : funcs.createTableRows(item, funcs);
 
   return {

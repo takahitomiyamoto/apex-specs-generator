@@ -20,10 +20,10 @@ import { createParameters } from './parameters';
 import { createTable } from './table';
 
 /**
- * @description createTableRowConstructors
+ * @description _createTableRowConstructors
  * @param {*} cons
  */
-export const createTableRowConstructors = (cons) => {
+const _createTableRowConstructors = (cons) => {
   const annotations = getAnnotations(cons.annotations);
   const modifiers = getModifiers(cons.modifiers);
   const parameters = !cons.parameters.length
@@ -39,11 +39,11 @@ export const createTableRowConstructors = (cons) => {
 };
 
 /**
- * @description createTableRowsConstructors
+ * @description _createTableRowsConstructors
  * @param {*} params
  * @param {*} funcs
  */
-export const createTableRowsConstructors = (params, funcs) => {
+const _createTableRowsConstructors = (params, funcs) => {
   return !params.length
     ? [funcs.createTableRow(params)]
     : params.map((cons) => {
@@ -57,8 +57,8 @@ export const createTableRowsConstructors = (params, funcs) => {
  */
 export const createTableConstructors = (params) => {
   return createTable(params, TABLE_HEADER_CONSTRUCTORS, {
-    createTableRow: createTableRowConstructors,
-    createTableRows: createTableRowsConstructors
+    createTableRow: _createTableRowConstructors,
+    createTableRows: _createTableRowsConstructors
   });
 };
 

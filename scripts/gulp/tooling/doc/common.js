@@ -1,7 +1,16 @@
 /**
  * @name doc/common.js
  */
-import { HEADERS_CLASS_TABLE, convert, escapeUnderscore } from './config';
+import { createListApexDoc, createTableApexDoc } from './apex-doc';
+import { createCode } from './code';
+import {
+  REGEXP_PARAM_LIST_TYPE,
+  REGEXP_PARAM_LEFT_PARENTHESIS,
+  REGEXP_PARAM_RIGHT_PARENTHESIS,
+  REGEXP_PARAM_COMMA,
+  convert,
+  escapeUnderscore
+} from './config';
 
 /**
  * @description getAnnotationNames
@@ -49,7 +58,7 @@ export const getModifiers = (modifiers) => {
  * @description getInterfaceNames
  * @param {*} interfaces
  */
-const getInterfaceNames = (interfaces) => {
+export const getInterfaceNames = (interfaces) => {
   if (!interfaces.length) {
     return ['-'];
   }
@@ -101,74 +110,80 @@ export const getVariables = (variables) => {
 };
 
 /**
- * @description createClassCodeContent
- * @param {*} params
+ * @description fetchTag
+ * @param {*} arrayBody
+ * @param {*} regexp
  */
-export const createClassCodeContent = (params) => {
-  const content = [];
-
-  if (params.annotations.length) {
-    const annotations = getAnnotations(params.annotations);
-    content.push(annotations);
-  }
-
-  let contentMain;
-  if (params.modifiers.length) {
-    const modifiers = getModifiers(params.modifiers);
-    contentMain = `${modifiers} class ${params.name}`;
-  } else {
-    contentMain = `class ${params.name}`;
-  }
-  if (params.parentClass) {
-    contentMain += ` extends ${params.parentClass}`;
-  }
-  if (params.interfaces.length) {
-    const interfaces = getInterfaceNames(params.interfaces).join(', ');
-    contentMain += ` implements ${interfaces}`;
-  }
-  content.push(contentMain);
-
-  return content;
+export const fetchTag = (arrayBody, regexpValue) => {
+  let tag = '';
+  arrayBody.forEach((line) => {
+    if (regexpValue.test(line)) {
+      tag = line.replace(regexpValue, '');
+    }
+  });
+  return tag;
 };
 
 /**
- * @description createClassCode
- * @param {*} params
+ * @description extractApexDoc
+ * @param {*} body
+ * @param {*} regexp
  */
-export const createClassCode = (params) => {
-  return {
-    language: 'java',
-    content: createClassCodeContent(params)
-  };
+export const extractApexDoc = (body, regexp) => {
+  body = body.replace(/\r\n?/g, '\n');
+  const targetRaws = body.match(regexp.target);
+  return !targetRaws
+    ? []
+    : targetRaws.map((raw) => {
+        const tags = raw
+          .replace(regexp.target, '$1')
+          .match(regexp.tags)
+          .map((tag) => {
+            return {
+              key: tag.replace(regexp.tags, '$1'),
+              value: tag.replace(regexp.tags, '$2')
+            };
+          });
+        const name = raw.replace(regexp.target, '$2');
+        const signature = raw
+          .replace(regexp.tagsArea, '')
+          .replace(regexp.annotationsEnd, '\n')
+          .replace(regexp.signatureStart, '')
+          .replace(regexp.signatureEnd, '');
+        const key = signature
+          .replace(regexp.keyStart, '')
+          .replace(REGEXP_PARAM_LIST_TYPE, '')
+          .replace(REGEXP_PARAM_LEFT_PARENTHESIS, '(')
+          .replace(REGEXP_PARAM_RIGHT_PARENTHESIS, ')')
+          .replace(REGEXP_PARAM_COMMA, ', ');
+
+        return {
+          tags: tags,
+          name: name,
+          signature: signature,
+          key: key
+        };
+      });
 };
 
 /**
- * @description createClassTableRows
+ * @description createTarget
+ * @param {*} body
  * @param {*} params
+ * @param {*} funcs
  */
-export const createClassTableRows = (params) => {
-  const annotations = getAnnotations(params.annotations);
-  const modifiers = getModifiers(params.modifiers);
-  const parentClass = !params.parentClass ? '-' : params.parentClass;
-  const interfaces = getInterfaceNames(params.interfaces).join(', ');
-  return [
-    [
-      `${annotations}`,
-      `${modifiers}`,
-      `${params.name}`,
-      `${parentClass}`,
-      `${interfaces}`
-    ]
-  ];
-};
+export const createTarget = (params, body, funcs) => {
+  const item = funcs.fetchItem(params, body);
 
-/**
- * @description createClassTable
- * @param {*} params
- */
-export const createClassTable = (params) => {
-  return {
-    headers: HEADERS_CLASS_TABLE,
-    rows: createClassTableRows(params)
-  };
+  const result = [];
+  result.push(funcs.createTitle(params));
+  result.push(createTableApexDoc(item));
+  result.push(
+    !funcs.createTableHeader ? { p: '' } : funcs.createTableHeader(params)
+  );
+  result.push(funcs.createTableTarget(params));
+  result.push(createListApexDoc(item));
+  result.push(createCode(item));
+
+  return result;
 };

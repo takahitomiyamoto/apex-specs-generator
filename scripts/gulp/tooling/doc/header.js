@@ -20,7 +20,7 @@ import { createTable } from './table';
  * @description _createTableRow
  * @param {*} params
  */
-export const _createTableRow = (params) => {
+const _createTableRow = (params) => {
   const row = [];
   row.push(`${params.namespace}`);
   row.push(`${params.manageableState}`);
