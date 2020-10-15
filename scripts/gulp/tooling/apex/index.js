@@ -115,7 +115,6 @@ async function generateApexSpecs(environment, apexType) {
      * 3. retrieve ContainerAsyncRequest - State
      * 4. retrieve ApexClassMembers / ApexTriggerMembers
      * 5. archive .json
-     * 6. generate .md from .json
      */
     await runBatch({
       environment: environment,

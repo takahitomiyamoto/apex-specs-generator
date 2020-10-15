@@ -38,7 +38,7 @@ export const createTableApexDoc = (item) => {
  */
 export const createListApexDoc = (item) => {
   return !item
-    ? {}
+    ? { p: '' }
     : {
         ul: item.tags.map((tag) => {
           return `**\`${tag.key}\`** : ${tag.value}`;

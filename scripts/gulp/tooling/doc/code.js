@@ -20,7 +20,7 @@ const _createCodeContent = (item) => {
  */
 export const createCode = (item) => {
   return !item
-    ? {}
+    ? { p: '' }
     : {
         code: {
           language: 'java',

@@ -1,102 +1,121 @@
 /**
  * @name doc/methods.js
  */
-import { NOT_APPLICABLE, TITLE_METHODS, HEADERS_METHODS_TABLE } from './config';
-import { getAnnotations, getModifiers } from './common';
-import { createParameters, createParametersArea } from './parameters';
+import {
+  REGEXP_KEY_START_METHOD,
+  REGEXP_METHOD,
+  REGEXP_TAGS_METHOD,
+  REGEXP_TAGS_AREA_METHOD,
+  REGEXP_ANNOTATIONS_END_METHOD,
+  REGEXP_SIGNATURE_START_METHOD,
+  REGEXP_SIGNATURE_END_METHOD,
+  TABLE_HEADER_METHODS
+} from './config';
+import {
+  createTarget,
+  extractApexDoc,
+  getAnnotations,
+  getModifiers
+} from './common';
+import { createParameters } from './parameters';
+import { createTable } from './table';
 
 /**
- * @description createMethodsTableRows
+ * @description _createTableRow
  * @param {*} params
  */
-const createMethodsTableRows = (params) => {
-  return [
-    [
-      `${getAnnotations(params.annotations)}`,
-      `${getModifiers(params.modifiers)}`,
-      `${params.returnType}`,
-      `${params.name}`
-    ]
-  ];
+const _createTableRow = (params) => {
+  const annotations = getAnnotations(params.annotations);
+  const modifiers = getModifiers(params.modifiers);
+  const parameters = !params.parameters.length
+    ? '-'
+    : createParameters(params.parameters).join(',<br>');
+
+  const row = [];
+  row.push(`${annotations}`);
+  row.push(`${modifiers}`);
+  row.push(`${params.returnType}`);
+  row.push(`${params.name}`);
+  row.push(`${parameters}`);
+  return row;
 };
 
 /**
- * @description createMethodsTable
- * @param {*} params
+ * @description _createTableMethods
+ * @param {*} meth
  */
-const createMethodsTable = (params) => {
-  return {
-    headers: HEADERS_METHODS_TABLE,
-    rows: createMethodsTableRows(params)
-  };
+const _createTableMethods = (meth) => {
+  return createTable(meth, TABLE_HEADER_METHODS, {
+    createTableRow: _createTableRow
+  });
 };
 
 /**
- * @description setMethodsCodeContent
- * @param {*} params
- * @param {*} parameters
+ * @description _fetchItem
+ * @param {*} meth
+ * @param {*} body
  */
-const setMethodsCodeContent = (params, parameters) => {
-  const content = [];
-
-  if (params.annotations.length) {
-    const annotations = getAnnotations(params.annotations);
-    content.push(annotations);
-  }
-
-  let contentMain = `${getModifiers(params.modifiers)} ${params.returnType} ${
-    params.name
-  }(${parameters.join(', ')})`;
-  content.push(contentMain);
-
-  return content;
+const _fetchItem = (meth, body) => {
+  const parameters = createParameters(meth.parameters);
+  const key = `${meth.name}(${parameters.join(', ')})`;
+  const item = body.methods.filter((i) => {
+    return key === i.key;
+  });
+  return !item.length ? null : item[0];
 };
 
 /**
- * @description setMethodsCode
- * @param {*} params
- * @param {*} parameters
+ * @description _createTitle
+ * @param {*} meth
  */
-const setMethodsCode = (params, parameters) => {
-  return {
-    language: 'java',
-    content: setMethodsCodeContent(params, parameters)
-  };
+const _createTitle = (meth) => {
+  return { h3: meth.name };
 };
 
 /**
  * @description createMethods
  * @param {*} params
  */
-const createMethods = (params) => {
-  return params.map((meth) => {
-    const parameters = createParameters(meth.parameters);
-    return [
-      { h3: meth.name },
-      {
-        table: createMethodsTable(meth)
-      },
-      createParametersArea(meth.parameters),
-      {
-        code: setMethodsCode(meth, parameters)
-      }
-    ];
+export const createMethods = (params) => {
+  const methods = params.items;
+  const body = params.body;
+
+  return methods.map((meth) => {
+    return createTarget(meth, body, {
+      fetchItem: _fetchItem,
+      createTitle: _createTitle,
+      createTableTarget: _createTableMethods
+    });
   });
 };
 
 /**
- * @description createMethodsArea
- * @param {*} params
+ * @description _parseBodyMethods
+ * @param {*} body
+ * @param {*} regexp
  */
-export const createMethodsArea = (params) => {
-  const result = [];
-  result.push({ h2: TITLE_METHODS });
+const _parseBodyMethods = (body, regexp) => {
+  const methods = extractApexDoc(body, regexp);
+  console.log(`\n## Methods`);
+  console.log(JSON.stringify(methods));
 
-  if (!params.length) {
-    result.push({ p: NOT_APPLICABLE });
-  } else {
-    result.push(createMethods(params));
-  }
+  return {
+    methods: methods
+  };
+};
 
-  return result;
+/**
+ * @description parseBodyMethods
+ * @param {*} body
+ */
+export const parseBodyMethods = (body) => {
+  return _parseBodyMethods(body, {
+    target: REGEXP_METHOD,
+    tags: REGEXP_TAGS_METHOD,
+    tagsArea: REGEXP_TAGS_AREA_METHOD,
+    annotationsEnd: REGEXP_ANNOTATIONS_END_METHOD,
+    signatureStart: REGEXP_SIGNATURE_START_METHOD,
+    signatureEnd: REGEXP_SIGNATURE_END_METHOD,
+    keyStart: REGEXP_KEY_START_METHOD
+  });
 };

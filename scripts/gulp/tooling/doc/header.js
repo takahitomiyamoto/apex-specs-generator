@@ -29,16 +29,6 @@ export const _createTableRow = (params) => {
 };
 
 /**
- * @description _createTableRowsHeader
- * @param {*} params
- */
-export const _createTableRowsHeader = (params) => {
-  const rows = [];
-  rows.push(_createTableRow(params));
-  return rows;
-};
-
-/**
  * @description _fetchItem
  * @param {*} params
  * @param {*} body
