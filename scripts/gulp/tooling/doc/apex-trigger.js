@@ -2,74 +2,31 @@
  * @name doc/apex-trigger.js
  */
 import { TABLE_HEADER_TRIGGER } from './config';
-import { createCode, createTableApexDoc } from './common';
+import { createTable } from './table';
 
 /**
- * @description _createTableRowsTrigger
+ * @description _createTableRowTrigger
  * @param {*} params
  */
-const _createTableRowsTrigger = (params) => {
-  return [
-    [
-      `${params.usageBeforeInsert ? 'Y' : ''}`,
-      `${params.usageBeforeUpdate ? 'Y' : ''}`,
-      `${params.usageBeforeDelete ? 'Y' : ''}`,
-      `${params.usageAfterInsert ? 'Y' : ''}`,
-      `${params.usageAfterUpdate ? 'Y' : ''}`,
-      `${params.usageAfterDelete ? 'Y' : ''}`,
-      `${params.usageAfterUndelete ? 'Y' : ''}`
-    ]
-  ];
+const _createTableRowTrigger = (params) => {
+  const row = [];
+  row.push(`${params.usageBeforeInsert ? 'Y' : ''}`);
+  row.push(`${params.usageBeforeUpdate ? 'Y' : ''}`);
+  row.push(`${params.usageBeforeDelete ? 'Y' : ''}`);
+  row.push(`${params.usageAfterInsert ? 'Y' : ''}`);
+  row.push(`${params.usageAfterUpdate ? 'Y' : ''}`);
+  row.push(`${params.usageAfterDelete ? 'Y' : ''}`);
+  row.push(`${params.usageAfterUndelete ? 'Y' : ''}`);
+  return row;
 };
 
 /**
- * @description _createTableTrigger
+ * @description createTableTrigger
  * @param {*} params
  * @param {*} func
  */
-const _createTableTrigger = (params, func) => {
-  return {
-    table: {
-      headers: TABLE_HEADER_TRIGGER,
-      rows: func.createTableRows(params)
-    }
-  };
-};
-
-/**
- * @description createHeaderAreaTrigger
- * @param {*} params
- * @param {*} funcs
- */
-export const createHeaderAreaTrigger = (params, funcs) => {
-  const body = params.body;
-
-  let item = body.header.filter((i) => {
-    return params.name === i.name;
+export const createTableTrigger = (params) => {
+  return createTable(params, TABLE_HEADER_TRIGGER, {
+    createTableRow: _createTableRowTrigger
   });
-
-  const result = [];
-
-  result.push([
-    createTableApexDoc(item),
-    funcs.createTableHeader(params, {
-      createTableRows: funcs.createTableRows
-    }),
-    _createTableTrigger(params, {
-      createTableRows: _createTableRowsTrigger
-    })
-  ]);
-
-  if (!item.length) {
-    return result;
-  }
-
-  item = item[0];
-
-  result.push([
-    funcs.createListApexDoc(item),
-    createCode(item, funcs.createCodeContent)
-  ]);
-
-  return result;
 };
