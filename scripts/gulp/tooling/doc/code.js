@@ -16,9 +16,7 @@ const _createCodeContent = (item) => {
 
 /**
  * @description createCode
- * @param {*} params
  * @param {*} item
- * @param {*} _createCodeContent
  */
 export const createCode = (item) => {
   return !item

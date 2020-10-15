@@ -23,7 +23,6 @@ const _createTableRowTrigger = (params) => {
 /**
  * @description createTableTrigger
  * @param {*} params
- * @param {*} func
  */
 export const createTableTrigger = (params) => {
   return createTable(params, TABLE_HEADER_TRIGGER, {

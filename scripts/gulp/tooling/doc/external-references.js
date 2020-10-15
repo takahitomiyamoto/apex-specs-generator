@@ -7,16 +7,32 @@ import {
   TITLE_EXTERNAL_REFERENCES
 } from './config';
 import { getMethods, getVariables } from './common';
+import { createTable } from './table';
 
 /**
- * @description _createTableRowsExternalReferences
- * @param {*} params
+ * @description _createTableRow
+ * @param {*} exte
  */
-const _createTableRowsExternalReferences = (params) => {
+const _createTableRow = (exte) => {
+  const variables = getVariables(exte.variables);
+  const methods = getMethods(exte.methods);
+
+  const row = [];
+  row.push(`${exte.namespace}`);
+  row.push(`${exte.name}`);
+  row.push(`${variables}`);
+  row.push(`${methods}`);
+  return row;
+};
+
+/**
+ * @description _createTableRows
+ * @param {*} params
+ * @param {*} funcs
+ */
+const _createTableRows = (params, funcs) => {
   return params.map((exte) => {
-    const variables = getVariables(exte.variables);
-    const methods = getMethods(exte.methods);
-    return [`${exte.namespace}`, `${exte.name}`, `${variables}`, `${methods}`];
+    return funcs.createTableRow(exte);
   });
 };
 
@@ -25,12 +41,18 @@ const _createTableRowsExternalReferences = (params) => {
  * @param {*} params
  */
 export const createTableExternalReferences = (params) => {
-  return {
-    table: {
-      headers: TABLE_HEADER_EXTERNAL_REFERENCES,
-      rows: _createTableRowsExternalReferences(params)
-    }
-  };
+  return createTable(params, TABLE_HEADER_EXTERNAL_REFERENCES, {
+    createTableRow: _createTableRow,
+    createTableRows: _createTableRows
+  });
+};
+
+/**
+ * @description _createExternalReferences
+ * @param {*} params
+ */
+const _createExternalReferences = (params) => {
+  return createTableExternalReferences(params.externalReferences);
 };
 
 /**
@@ -38,14 +60,13 @@ export const createTableExternalReferences = (params) => {
  * @param {*} params
  */
 export const createExternalReferencesArea = (params) => {
-  const externalReferences = params.externalReferences;
   const result = [];
   result.push({ h2: TITLE_EXTERNAL_REFERENCES });
 
-  if (!externalReferences.length) {
+  if (!params.externalReferences.length) {
     result.push({ p: NOT_APPLICABLE });
   } else {
-    result.push(createTableExternalReferences(externalReferences));
+    result.push(_createExternalReferences(params));
   }
 
   return result;

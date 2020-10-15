@@ -25,7 +25,6 @@ const _createTableRowsApexDoc = (item) => {
 /**
  * @description createTableApexDoc
  * @param {*} item
- * @param {*} headers
  */
 export const createTableApexDoc = (item) => {
   return createTable(item, TABLE_HEADER_APEX_DOC, {

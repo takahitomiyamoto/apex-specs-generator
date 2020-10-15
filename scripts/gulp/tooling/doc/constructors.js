@@ -22,6 +22,25 @@ import { createParameters } from './parameters';
 import { createTable } from './table';
 
 /**
+ * @description createTableRowConstructors
+ * @param {*} cons
+ */
+export const createTableRowConstructors = (cons) => {
+  const annotations = getAnnotations(cons.annotations);
+  const modifiers = getModifiers(cons.modifiers);
+  const parameters = !cons.parameters.length
+    ? '-'
+    : createParameters(cons.parameters).join(',<br>');
+
+  const row = [];
+  row.push(`${annotations}`);
+  row.push(`${modifiers}`);
+  row.push(`${cons.name}`);
+  row.push(`${parameters}`);
+  return row;
+};
+
+/**
  * @description createTableRowsConstructors
  * @param {*} params
  * @param {*} funcs
@@ -35,28 +54,8 @@ export const createTableRowsConstructors = (params, funcs) => {
 };
 
 /**
- * @description createTableRowConstructors
- * @param {*} params
- */
-export const createTableRowConstructors = (params) => {
-  const annotations = getAnnotations(params.annotations);
-  const modifiers = getModifiers(params.modifiers);
-  const parameters = !params.parameters.length
-    ? '-'
-    : createParameters(params.parameters).join(',<br>');
-
-  const row = [];
-  row.push(`${annotations}`);
-  row.push(`${modifiers}`);
-  row.push(`${params.name}`);
-  row.push(`${parameters}`);
-  return row;
-};
-
-/**
  * @description createTableConstructors
  * @param {*} params
- * @param {*} funcs
  */
 export const createTableConstructors = (params) => {
   return createTable(params, TABLE_HEADER_CONSTRUCTORS, {
@@ -68,6 +67,7 @@ export const createTableConstructors = (params) => {
 /**
  * @description _fetchItem
  * @param {*} cons
+ * @param {*} body
  */
 const _fetchItem = (cons, body) => {
   const parameters = createParameters(cons.parameters);
@@ -90,7 +90,6 @@ const _createTitle = (cons) => {
 /**
  * @description _createConstructors
  * @param {*} params
- * @param {*} body
  */
 const _createConstructors = (params) => {
   const constructors = params.constructors;

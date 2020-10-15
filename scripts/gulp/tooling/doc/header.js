@@ -41,13 +41,21 @@ export const _createTableRowsHeader = (params) => {
 /**
  * @description _fetchItem
  * @param {*} params
+ * @param {*} body
  */
-const _fetchItem = (params) => {
-  const body = params.body;
+const _fetchItem = (params, body) => {
   const item = body.header.filter((i) => {
     return params.name === i.name;
   });
   return !item.length ? null : item[0];
+};
+
+/**
+ * @description _createTitle
+ * @param {*} params
+ */
+const _createTitle = (params) => {
+  return { h2: params.name };
 };
 
 /**
@@ -63,11 +71,13 @@ const _createTableHeader = (params) => {
 /**
  * @description _createHeaderArea
  * @param {*} params
+ * @param {*} funcs
  */
 const _createHeaderArea = (params, funcs) => {
-  const item = _fetchItem(params);
-
-  return createTarget(params, item, {
+  const body = params.body;
+  return createTarget(params, body, {
+    fetchItem: _fetchItem,
+    createTitle: _createTitle,
     createTableHeader: _createTableHeader,
     createTableTarget: funcs.createTableTarget
   });
