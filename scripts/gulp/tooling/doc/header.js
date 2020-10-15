@@ -1,7 +1,9 @@
 /**
  * @name doc/header.js
  */
-import { extractApexDoc } from './common';
+import { createTableClass } from './apex-class';
+import { createTableTrigger } from './apex-trigger';
+import { createTarget, extractApexDoc } from './common';
 import {
   REGEXP_ANNOTATIONS_END_HEADER,
   REGEXP_HEADER_CLASS,
@@ -12,70 +14,63 @@ import {
   REGEXP_TAGS_HEADER,
   TABLE_HEADER_HEADER
 } from './config';
-import { createHeaderAreaApexClass } from './apex-class';
-import { createHeaderAreaTrigger } from './apex-trigger';
+import { createTable } from './table';
+
+/**
+ * @description _createTableRow
+ * @param {*} params
+ */
+export const _createTableRow = (params) => {
+  const row = [];
+  row.push(`${params.namespace}`);
+  row.push(`${params.manageableState}`);
+  row.push(`${params.apiVersion}`);
+  return row;
+};
 
 /**
  * @description _createTableRowsHeader
  * @param {*} params
  */
 export const _createTableRowsHeader = (params) => {
-  return [
-    [`${params.namespace}`, `${params.manageableState}`, `${params.apiVersion}`]
-  ];
+  const rows = [];
+  rows.push(_createTableRow(params));
+  return rows;
+};
+
+/**
+ * @description _fetchItem
+ * @param {*} params
+ */
+const _fetchItem = (params) => {
+  const body = params.body;
+  const item = body.header.filter((i) => {
+    return params.name === i.name;
+  });
+  return !item.length ? null : item[0];
 };
 
 /**
  * @description _createTableHeader
  * @param {*} params
- * @param {*} funcs
  */
-const _createTableHeader = (params, funcs) => {
-  return {
-    table: {
-      headers: TABLE_HEADER_HEADER,
-      rows: funcs.createTableRows(params)
-    }
-  };
+const _createTableHeader = (params) => {
+  return createTable(params, TABLE_HEADER_HEADER, {
+    createTableRow: _createTableRow
+  });
 };
 
 /**
- * @description _createListApexDoc
- * @param {*} item
- */
-const _createListApexDoc = (item) => {
-  return {
-    ul: item.tags.map((tag) => {
-      return `**\`${tag.key}\`** : ${tag.value}`;
-    })
-  };
-};
-
-/**
- * @description _createCodeContent
+ * @description _createHeaderArea
  * @param {*} params
- * @param {*} header
  */
-const _createCodeContent = (header) => {
-  const content = [];
+const _createHeaderArea = (params, funcs) => {
+  const item = _fetchItem(params);
 
-  content.push(header.signature);
-  return content;
-};
-
-/**
- * @description _parseBodyHeader
- * @param {*} body
- * @param {*} regexp
- */
-const _parseBodyHeader = (body, regexp) => {
-  const header = extractApexDoc(body, regexp);
-  console.log(`\n## Header`);
-  console.log(JSON.stringify(header));
-
-  return {
-    header: header
-  };
+  return createTarget(params, item, {
+    createTableHeader: _createTableHeader,
+    createTableTarget: funcs.createTableTarget
+  });
 };
 
 /**
@@ -110,7 +105,7 @@ export const createHeaderArea = (params) => {
 
   switch (attributes.type) {
     case 'ApexClass':
-      return createHeaderAreaApexClass(
+      return _createHeaderArea(
         {
           namespace: namespace,
           manageableState: manageableState,
@@ -122,15 +117,10 @@ export const createHeaderArea = (params) => {
           interfaces: interfaces,
           body: body
         },
-        {
-          createTableHeader: _createTableHeader,
-          createTableRows: _createTableRowsHeader,
-          createListApexDoc: _createListApexDoc,
-          createCodeContent: _createCodeContent
-        }
+        { createTableTarget: createTableClass }
       );
     case 'ApexTrigger':
-      return createHeaderAreaTrigger(
+      return _createHeaderArea(
         {
           namespace: namespace,
           manageableState: manageableState,
@@ -146,16 +136,26 @@ export const createHeaderArea = (params) => {
           entityDefinition: entityDefinition,
           body: body
         },
-        {
-          createTableHeader: _createTableHeader,
-          createTableRows: _createTableRowsHeader,
-          createListApexDoc: _createListApexDoc,
-          createCodeContent: _createCodeContent
-        }
+        { createTableTarget: createTableTrigger }
       );
     default:
       return {};
   }
+};
+
+/**
+ * @description _parseBodyHeader
+ * @param {*} body
+ * @param {*} regexp
+ */
+const _parseBodyHeader = (body, regexp) => {
+  const header = extractApexDoc(body, regexp);
+  console.log(`\n## Header`);
+  console.log(JSON.stringify(header));
+
+  return {
+    header: header
+  };
 };
 
 /**
