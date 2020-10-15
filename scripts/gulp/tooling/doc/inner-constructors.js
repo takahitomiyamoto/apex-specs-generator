@@ -2,20 +2,7 @@
  * @name doc/inner-constructors.js
  */
 import { TITLE_CONSTRUCTORS } from './config';
-import {
-  createTableConstructors,
-  createTableRowsConstructors
-} from './constructors';
-
-/**
- * @description _createTableRowsInnerConstructors
- * @param {*} params
- */
-const _createTableRowsInnerConstructors = (params) => {
-  return params.map((cons) => {
-    return createTableRowsConstructors(cons)[0];
-  });
-};
+import { createTableConstructors } from './constructors';
 
 /**
  * @description createInnerConstructorsArea
@@ -29,11 +16,7 @@ export const createInnerConstructorsArea = (params) => {
     return [];
   }
 
-  result.push(
-    createTableConstructors(params, {
-      createTableRows: _createTableRowsInnerConstructors
-    })
-  );
+  result.push(createTableConstructors(params));
 
   return result;
 };

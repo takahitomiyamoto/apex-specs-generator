@@ -2,17 +2,7 @@
  * @name doc/inner-properties.js
  */
 import { TITLE_PROPERTIES } from './config';
-import { createTableProperties, createTableRowsProperty } from './properties';
-
-/**
- * @description _createTableRowsInnerProperties
- * @param {*} params
- */
-const _createTableRowsInnerProperties = (params) => {
-  return params.map((inne) => {
-    return createTableRowsProperty(inne)[0];
-  });
-};
+import { createTableProperties } from './properties';
 
 /**
  * @description createInnerPropertiesArea
@@ -26,11 +16,7 @@ export const createInnerPropertiesArea = (params) => {
     return [];
   }
 
-  result.push(
-    createTableProperties(params, {
-      createTableRows: _createTableRowsInnerProperties
-    })
-  );
+  result.push(createTableProperties(params));
 
   return result;
 };

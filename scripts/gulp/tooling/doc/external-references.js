@@ -48,5 +48,6 @@ export const createTableExternalReferences = (params) => {
  * @param {*} params
  */
 export const createExternalReferences = (params) => {
-  return createTableExternalReferences(params.externalReferences);
+  const externalReferences = params.items;
+  return createTableExternalReferences(externalReferences);
 };
