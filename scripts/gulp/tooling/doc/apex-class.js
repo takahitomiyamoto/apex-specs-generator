@@ -3,13 +3,13 @@
  */
 import { getAnnotations, getModifiers, getInterfaceNames } from './common';
 import { TABLE_HEADER_CLASS } from './config';
-import { createTable, createTableRows } from './table';
+import { createTable } from './table';
 
 /**
- * @description _createTableRowClass
+ * @description createTableRowClass
  * @param {*} params
  */
-const _createTableRowClass = (params) => {
+export const createTableRowClass = (params) => {
   const annotations = getAnnotations(params.annotations);
   const modifiers = getModifiers(params.modifiers);
   const parentClass = !params.parentClass ? '-' : params.parentClass;
@@ -25,19 +25,11 @@ const _createTableRowClass = (params) => {
 };
 
 /**
- * @description createTableRowsClass
- * @param {*} params
- */
-export const createTableRowsClass = (params) => {
-  return createTableRows(params, { createTableRow: _createTableRowClass });
-};
-
-/**
  * @description createTableClass
  * @param {*} params
  */
 export const createTableClass = (params) => {
   return createTable(params, TABLE_HEADER_CLASS, {
-    createTableRows: createTableRowsClass
+    createTableRow: createTableRowClass
   });
 };
