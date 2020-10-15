@@ -2,15 +2,13 @@
  * @name doc/constructors.js
  */
 import {
-  NOT_APPLICABLE,
   REGEXP_CONSTRUCTOR,
   REGEXP_TAGS_CONSTRUCTOR,
   REGEXP_TAGS_AREA_CONSTRUCTOR,
   REGEXP_ANNOTATIONS_END_CONSTRUCTOR,
   REGEXP_SIGNATURE_START_CONSTRUCTOR,
   REGEXP_SIGNATURE_END_CONSTRUCTOR,
-  TABLE_HEADER_CONSTRUCTORS,
-  TITLE_CONSTRUCTORS
+  TABLE_HEADER_CONSTRUCTORS
 } from './config';
 import {
   createTarget,
@@ -88,11 +86,11 @@ const _createTitle = (cons) => {
 };
 
 /**
- * @description _createConstructors
+ * @description createConstructors
  * @param {*} params
  */
-const _createConstructors = (params) => {
-  const constructors = params.constructors;
+export const createConstructors = (params) => {
+  const constructors = params.items;
   const body = params.body;
 
   return constructors.map((cons) => {
@@ -102,23 +100,6 @@ const _createConstructors = (params) => {
       createTableTarget: createTableConstructors
     });
   });
-};
-
-/**
- * @description createConstructorsArea
- * @param {*} params
- */
-export const createConstructorsArea = (params) => {
-  const result = [];
-  result.push({ h2: TITLE_CONSTRUCTORS });
-
-  if (!params.constructors.length) {
-    result.push({ p: NOT_APPLICABLE });
-  } else {
-    result.push(_createConstructors(params));
-  }
-
-  return result;
 };
 
 /**

@@ -1,11 +1,7 @@
 /**
  * @name doc/external-references.js
  */
-import {
-  NOT_APPLICABLE,
-  TABLE_HEADER_EXTERNAL_REFERENCES,
-  TITLE_EXTERNAL_REFERENCES
-} from './config';
+import { TABLE_HEADER_EXTERNAL_REFERENCES } from './config';
 import { getMethods, getVariables } from './common';
 import { createTable } from './table';
 
@@ -48,26 +44,9 @@ export const createTableExternalReferences = (params) => {
 };
 
 /**
- * @description _createExternalReferences
+ * @description createExternalReferences
  * @param {*} params
  */
-const _createExternalReferences = (params) => {
+export const createExternalReferences = (params) => {
   return createTableExternalReferences(params.externalReferences);
-};
-
-/**
- * @description createExternalReferencesArea
- * @param {*} params
- */
-export const createExternalReferencesArea = (params) => {
-  const result = [];
-  result.push({ h2: TITLE_EXTERNAL_REFERENCES });
-
-  if (!params.externalReferences.length) {
-    result.push({ p: NOT_APPLICABLE });
-  } else {
-    result.push(_createExternalReferences(params));
-  }
-
-  return result;
 };

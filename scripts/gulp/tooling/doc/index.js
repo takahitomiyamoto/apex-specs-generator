@@ -3,20 +3,28 @@
  */
 import json2md from 'json2md';
 import { readFileSyncUtf8, writeFileSyncUtf8 } from '../../common/lib';
-import { createHeaderArea } from './header';
-import { createExternalReferencesArea } from './external-references';
-import { createInnerClassesArea } from './inner-classes';
-import { createPropertiesArea } from './properties';
-import { createConstructorsArea } from './constructors';
-import { createMethodsArea } from './methods';
+import {
+  NOT_APPLICABLE,
+  TITLE_EXTERNAL_REFERENCES,
+  TITLE_INNER_CLASSES,
+  TITLE_PROPERTIES,
+  TITLE_CONSTRUCTORS,
+  TITLE_METHODS
+} from './config';
+import { createHeaderArea, parseBodyHeader } from './header';
+import { createExternalReferences } from './external-references';
+import { createInnerClasses, parseBodyInnerClasses } from './inner-classes';
+import { createProperties, parseBodyProperties } from './properties';
+import { parseBodyConstructors, createConstructors } from './constructors';
+import { parseBodyMethods, createMethods } from './methods';
 
 /**
- * @description addRawData
+ * @description _addRawData
  * @param {*} md
  * @param {*} json
  * @param {*} filename
  */
-const addRawData = (md, json, filename) => {
+const _addRawData = (md, json, filename) => {
   md.push({ h2: 'Raw Data' });
   const h3List = Object.keys(json);
   for (let h3 of h3List) {
@@ -28,11 +36,11 @@ const addRawData = (md, json, filename) => {
 };
 
 /**
- * @description getJsonApexMember
+ * @description _getJsonApexMember
  * @param {*} config
  * @param {*} apexMember
  */
-const getJsonApexMember = (config, apexMember) => {
+const _getJsonApexMember = (config, apexMember) => {
   const stringApexMember = readFileSyncUtf8(
     `${config.symbolTableFolder}/${apexMember}.json`
   );
@@ -41,11 +49,11 @@ const getJsonApexMember = (config, apexMember) => {
 };
 
 /**
- * @description getJsonApex
+ * @description _getJsonApex
  * @param {*} config
  * @param {*} apexMember
  */
-const getJsonApex = (config, apexMember) => {
+const _getJsonApex = (config, apexMember) => {
   const stringApex = readFileSyncUtf8(`${config.retrieveLogFile}`);
   const records = JSON.parse(stringApex).records;
 
@@ -55,42 +63,131 @@ const getJsonApex = (config, apexMember) => {
 };
 
 /**
+ * @description _createArea
+ * @param {*} config
+ * @param {*} params
+ */
+const _createArea = (config, params) => {
+  const result = [];
+  result.push({ h2: config.title });
+
+  if (!params.items.length) {
+    result.push({ p: NOT_APPLICABLE });
+  } else {
+    result.push(config.create(params));
+  }
+
+  return result;
+};
+
+/**
  * @description generateMarkdownSpecs
  * @param {*} config
  * @param {*} apexMember
  */
 const generateMarkdownSpecs = (config, apexMember) => {
-  const jsonApex = getJsonApex(config, apexMember);
-  const jsonApexMember = getJsonApexMember(config, apexMember);
+  const jsonApex = _getJsonApex(config, apexMember);
+  const jsonApexMember = _getJsonApexMember(config, apexMember);
 
-  const md = [];
+  // TODO: 表示内容をON／OFFできるようにする
 
   // Title
-  md.push({ h1: `${jsonApexMember.name}${config.fileExtension}` });
+  const title = `${jsonApexMember.name}${config.fileExtension}`;
+  console.log(`\n---`);
+  console.log(`\n# ${title}`);
+
+  const md = [];
+  md.push({ h1: title });
+
+  const bodyHeader = parseBodyHeader(jsonApex.Body, jsonApex.attributes.type);
+  const bodyInnerClass = parseBodyInnerClasses(jsonApex.Body);
+  const bodyProperties = parseBodyProperties(jsonApex.Body);
+  const bodyConstructors = parseBodyConstructors(jsonApex.Body);
+  const bodyMethods = parseBodyMethods(jsonApex.Body);
 
   // Header
-  md.push(createHeaderArea(jsonApex, jsonApexMember));
+  md.push(
+    createHeaderArea({
+      apex: jsonApex,
+      apexMember: jsonApexMember,
+      body: bodyHeader
+    })
+  );
   md.push({ p: '<br>' });
 
   // External References
-  md.push(createExternalReferencesArea(jsonApexMember.externalReferences));
+  md.push(
+    _createArea(
+      {
+        title: TITLE_EXTERNAL_REFERENCES,
+        create: createExternalReferences
+      },
+      {
+        items: jsonApexMember.externalReferences
+      }
+    )
+  );
   md.push({ p: '<br>' });
 
   if ('ApexClass' === jsonApex.attributes.type) {
     // Inner Classes
-    md.push(createInnerClassesArea(jsonApexMember.innerClasses));
+    md.push(
+      _createArea(
+        {
+          title: TITLE_INNER_CLASSES,
+          create: createInnerClasses
+        },
+        {
+          items: jsonApexMember.innerClasses,
+          body: bodyInnerClass
+        }
+      )
+    );
     md.push({ p: '<br>' });
 
     // Properties
-    md.push(createPropertiesArea(jsonApexMember.properties));
+    md.push(
+      _createArea(
+        {
+          title: TITLE_PROPERTIES,
+          create: createProperties
+        },
+        {
+          items: jsonApexMember.properties,
+          body: bodyProperties
+        }
+      )
+    );
     md.push({ p: '<br>' });
 
     // Constructors
-    md.push(createConstructorsArea(jsonApexMember.constructors));
+    md.push(
+      _createArea(
+        {
+          title: TITLE_CONSTRUCTORS,
+          create: createConstructors
+        },
+        {
+          items: jsonApexMember.constructors,
+          body: bodyConstructors
+        }
+      )
+    );
     md.push({ p: '<br>' });
 
     // Methods
-    md.push(createMethodsArea(jsonApexMember.methods));
+    md.push(
+      _createArea(
+        {
+          title: TITLE_METHODS,
+          create: createMethods
+        },
+        {
+          items: jsonApexMember.methods,
+          body: bodyMethods
+        }
+      )
+    );
     md.push({ p: '<br>' });
   }
 
@@ -99,7 +196,7 @@ const generateMarkdownSpecs = (config, apexMember) => {
 
   // raw data
   const filename = `${config.rawDataFolder}/${apexMember}.raw.md`;
-  addRawData(md, jsonApexMember, filename);
+  _addRawData(md, jsonApexMember, filename);
 };
 
 /**
