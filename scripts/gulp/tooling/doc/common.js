@@ -135,15 +135,15 @@ export const extractApexDoc = (body, regexp) => {
   return !targetRaws
     ? []
     : targetRaws.map((raw) => {
-        const tags = raw
-          .replace(regexp.target, '$1')
-          .match(regexp.tags)
-          .map((tag) => {
-            return {
-              key: tag.replace(regexp.tags, '$1'),
-              value: tag.replace(regexp.tags, '$2')
-            };
-          });
+        const rawTags = raw.replace(regexp.target, '$1').match(regexp.tags);
+        const tags = !rawTags
+          ? []
+          : rawTags.map((tag) => {
+              return {
+                key: tag.replace(regexp.tags, '$1'),
+                value: tag.replace(regexp.tags, '$2')
+              };
+            });
         const name = raw.replace(regexp.target, '$2');
         const signature = raw
           .replace(regexp.tagsArea, '')

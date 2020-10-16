@@ -14,7 +14,7 @@ const ANNOTATIONS_END = '\\n\\s+';
 const ASSIGNED_VALUE = `[\\s\\=\\w\\.\\(\\)<>,]*;\\n`;
 const CLASS_OPTIONS = `(extends\\s[\\w<>]+\\s|implements\\s\\w+\\s)*`;
 const NAME = `(\\w+)`;
-const VALUE = `(.+(\\s\\(\\)\\.<>,:;=)*)`;
+const VALUE = `(.+(\\s\\(\\)\\.<>,:;='")*)`;
 const RETURN_TYPE = `[\\w\\.<>]`;
 const TAGS_AREA_START = `\\/\\*+\\n`;
 const TAGS_AREA_END = `\\s+\\*+\\/\\n`;
