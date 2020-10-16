@@ -2,88 +2,132 @@
  * @name doc/constructors.js
  */
 import {
-  HEADERS_CONSTRUCTORS_TABLE,
-  NOT_APPLICABLE,
-  TITLE_CONSTRUCTORS
+  REGEXP_CONSTRUCTOR,
+  REGEXP_TAGS_CONSTRUCTOR,
+  REGEXP_TAGS_AREA_CONSTRUCTOR,
+  REGEXP_ANNOTATIONS_END_CONSTRUCTOR,
+  REGEXP_SIGNATURE_START_CONSTRUCTOR,
+  REGEXP_SIGNATURE_END_CONSTRUCTOR,
+  TABLE_HEADER_CONSTRUCTORS
 } from './config';
-import { getModifiers } from './common';
-import { createParameters, createParametersArea } from './parameters';
+import {
+  createTarget,
+  extractApexDoc,
+  getAnnotations,
+  getModifiers
+} from './common';
+import { createParameters } from './parameters';
+import { createTable } from './table';
 
 /**
- * @description createConstructorsTableRows
- * @param {*} params
+ * @description _createTableRowConstructors
+ * @param {*} cons
  */
-const createConstructorsTableRows = (params) => {
-  return [[`${getModifiers(params.modifiers)}`, `${params.name}`]];
+const _createTableRowConstructors = (cons) => {
+  const annotations = getAnnotations(cons.annotations);
+  const modifiers = getModifiers(cons.modifiers);
+  const parameters = !cons.parameters.length
+    ? '-'
+    : createParameters(cons.parameters).join(',<br>');
+
+  const row = [];
+  row.push(`${annotations}`);
+  row.push(`${modifiers}`);
+  row.push(`${cons.name}`);
+  row.push(`${parameters}`);
+  return row;
 };
 
 /**
- * @description createConstructorsTable
+ * @description _createTableRowsConstructors
  * @param {*} params
+ * @param {*} funcs
  */
-const createConstructorsTable = (params) => {
-  return {
-    headers: HEADERS_CONSTRUCTORS_TABLE,
-    rows: createConstructorsTableRows(params)
-  };
+const _createTableRowsConstructors = (params, funcs) => {
+  return !params.length
+    ? [funcs.createTableRow(params)]
+    : params.map((cons) => {
+        return funcs.createTableRow(cons);
+      });
 };
 
 /**
- * @description createClassCodeContent
+ * @description createTableConstructors
  * @param {*} params
- * @param {*} parameters
  */
-const createClassCodeContent = (params, parameters) => {
-  return `${getModifiers(params.modifiers)} ${params.name}(${parameters.join(
-    ', '
-  )})`;
+export const createTableConstructors = (params) => {
+  return createTable(params, TABLE_HEADER_CONSTRUCTORS, {
+    createTableRow: _createTableRowConstructors,
+    createTableRows: _createTableRowsConstructors
+  });
 };
 
 /**
- * @description setConstructorsCode
- * @param {*} params
- * @param {*} parameters
+ * @description _fetchItem
+ * @param {*} cons
+ * @param {*} body
  */
-const setConstructorsCode = (params, parameters) => {
-  return {
-    language: 'java',
-    content: createClassCodeContent(params, parameters)
-  };
+const _fetchItem = (cons, body) => {
+  const parameters = createParameters(cons.parameters);
+  const modifiers = getModifiers(cons.modifiers);
+  const signature = `${modifiers} ${cons.name}(${parameters.join(', ')})`;
+  const item = body.constructors.filter((i) => {
+    return signature === i.signature;
+  });
+  return !item.length ? null : item[0];
+};
+
+/**
+ * @description _createTitle
+ * @param {*} cons
+ */
+const _createTitle = (cons) => {
+  return { h3: cons.name };
 };
 
 /**
  * @description createConstructors
  * @param {*} params
  */
-const createConstructors = (params) => {
-  return params.map((cons) => {
-    const parameters = createParameters(cons.parameters);
-    return [
-      { h3: cons.name },
-      {
-        table: createConstructorsTable(cons)
-      },
-      createParametersArea(cons.parameters),
-      {
-        code: setConstructorsCode(cons, parameters)
-      }
-    ];
+export const createConstructors = (params) => {
+  const constructors = params.items;
+  const body = params.body;
+
+  return constructors.map((cons) => {
+    return createTarget(cons, body, {
+      fetchItem: _fetchItem,
+      createTitle: _createTitle,
+      createTableTarget: createTableConstructors
+    });
   });
 };
 
 /**
- * @description createConstructorsArea
- * @param {*} params
+ * @description _parseBodyConstructors
+ * @param {*} body
+ * @param {*} regexp
  */
-export const createConstructorsArea = (params) => {
-  const result = [];
-  result.push({ h2: TITLE_CONSTRUCTORS });
+const _parseBodyConstructors = (body, regexp) => {
+  const constructors = extractApexDoc(body, regexp);
+  console.log(`\n## Constructors`);
+  console.log(JSON.stringify(constructors));
 
-  if (!params.length) {
-    result.push({ p: NOT_APPLICABLE });
-  } else {
-    result.push(createConstructors(params));
-  }
+  return {
+    constructors: constructors
+  };
+};
 
-  return result;
+/**
+ * @description parseBodyConstructors
+ * @param {*} body
+ */
+export const parseBodyConstructors = (body) => {
+  return _parseBodyConstructors(body, {
+    target: REGEXP_CONSTRUCTOR,
+    tags: REGEXP_TAGS_CONSTRUCTOR,
+    tagsArea: REGEXP_TAGS_AREA_CONSTRUCTOR,
+    annotationsEnd: REGEXP_ANNOTATIONS_END_CONSTRUCTOR,
+    signatureStart: REGEXP_SIGNATURE_START_CONSTRUCTOR,
+    signatureEnd: REGEXP_SIGNATURE_END_CONSTRUCTOR
+  });
 };

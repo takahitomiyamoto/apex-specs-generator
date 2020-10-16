@@ -1,158 +1,175 @@
 /**
  * @name doc/header.js
  */
-import { HEADERS_HEADER_TABLE, HEADERS_TRIGGER_TABLE } from './config';
-import { createClassCode, createClassTable } from './common';
+import { createTableClass } from './apex-class';
+import { createTableTrigger } from './apex-trigger';
+import { createTarget, extractApexDoc } from './common';
+import {
+  REGEXP_ANNOTATIONS_END_HEADER,
+  REGEXP_HEADER_CLASS,
+  REGEXP_HEADER_TRIGGER,
+  REGEXP_SIGNATURE_END_HEADER,
+  REGEXP_SIGNATURE_START_HEADER,
+  REGEXP_TAGS_AREA_HEADER,
+  REGEXP_TAGS_HEADER,
+  TABLE_HEADER_HEADER
+} from './config';
+import { createTable } from './table';
 
 /**
- * @description createHeaderTable
+ * @description _createTableRow
  * @param {*} params
  */
-const createHeaderTable = (params) => {
-  return {
-    headers: HEADERS_HEADER_TABLE,
-    rows: [
-      [
-        `${params.namespace}`,
-        `${params.manageableState}`,
-        `${params.apiVersion}`
-      ]
-    ]
-  };
+const _createTableRow = (params) => {
+  const row = [];
+  row.push(`${params.namespace}`);
+  row.push(`${params.manageableState}`);
+  row.push(`${params.apiVersion}`);
+  return row;
 };
 
 /**
- * @description createTriggerTable
+ * @description _fetchItem
  * @param {*} params
+ * @param {*} body
  */
-const createTriggerTable = (params) => {
-  return {
-    headers: HEADERS_TRIGGER_TABLE,
-    rows: [
-      [
-        `${params.usageBeforeInsert ? 'Y' : ''}`,
-        `${params.usageBeforeUpdate ? 'Y' : ''}`,
-        `${params.usageBeforeDelete ? 'Y' : ''}`,
-        `${params.usageAfterInsert ? 'Y' : ''}`,
-        `${params.usageAfterUpdate ? 'Y' : ''}`,
-        `${params.usageAfterDelete ? 'Y' : ''}`,
-        `${params.usageAfterUndelete ? 'Y' : ''}`
-      ]
-    ]
-  };
+const _fetchItem = (params, body) => {
+  const item = body.header.filter((i) => {
+    return params.name === i.name;
+  });
+  return !item.length ? null : item[0];
 };
 
 /**
- * @description createTriggerCodeContent
+ * @description _createTitle
  * @param {*} params
  */
-const createTriggerCodeContent = (params) => {
-  return [`trigger ${params.name} on ${params.entityDefinition.DeveloperName}`];
+const _createTitle = (params) => {
+  return { h2: params.name };
 };
 
 /**
- * @description createTriggerCode
+ * @description _createTableHeader
  * @param {*} params
  */
-const createTriggerCode = (params) => {
-  return {
-    language: 'java',
-    content: createTriggerCodeContent(params)
-  };
+const _createTableHeader = (params) => {
+  return createTable(params, TABLE_HEADER_HEADER, {
+    createTableRow: _createTableRow
+  });
 };
 
 /**
- * @description createHeaderAreaApexClass
+ * @description _createHeaderArea
  * @param {*} params
+ * @param {*} funcs
  */
-const createHeaderAreaApexClass = (params) => {
-  return [
-    {
-      table: createHeaderTable(params)
-    },
-    {
-      table: createClassTable(params)
-    },
-    {
-      code: createClassCode(params)
-    }
-  ];
-};
-
-/**
- * @description createHeaderAreaApexTrigger
- * @param {*} params
- */
-const createHeaderAreaApexTrigger = (params) => {
-  return [
-    {
-      table: createHeaderTable(params)
-    },
-    {
-      table: createTriggerTable(params)
-    },
-    {
-      code: createTriggerCode(params)
-    }
-  ];
+const _createHeaderArea = (params, funcs) => {
+  const body = params.body;
+  return createTarget(params, body, {
+    fetchItem: _fetchItem,
+    createTitle: _createTitle,
+    createTableHeader: _createTableHeader,
+    createTableTarget: funcs.createTableTarget
+  });
 };
 
 /**
  * @description createHeaderArea
- * @param {*} jsonApex
- * @param {*} jsonApexMember
+ * @param {*} params
  */
-export const createHeaderArea = (jsonApex, jsonApexMember) => {
+export const createHeaderArea = (params) => {
+  const apex = params.apex;
+  const apexMember = params.apexMember;
+  const body = params.body;
   // Common
-  const namespace = jsonApexMember.namespace;
-  const manageableState = jsonApex.ManageableState;
-  const apiVersion = jsonApex.ApiVersion.toFixed(1);
-  const attributes = jsonApex.attributes;
-  const table = jsonApexMember.tableDeclaration;
+  const namespace = apexMember.namespace;
+  const manageableState = apex.ManageableState;
+  const apiVersion = apex.ApiVersion.toFixed(1);
+  const attributes = apex.attributes;
+  const table = apexMember.tableDeclaration;
   const name = table.name;
   // ApexClass
   const annotations = table.annotations;
   const modifiers = table.modifiers;
-  const parentClass = jsonApexMember.parentClass;
-  const interfaces = jsonApexMember.interfaces;
+  const parentClass = apexMember.parentClass;
+  const interfaces = apexMember.interfaces;
   // ApexTrigger
-  const usageBeforeInsert = jsonApex.UsageBeforeInsert;
-  const usageBeforeUpdate = jsonApex.UsageBeforeUpdate;
-  const usageBeforeDelete = jsonApex.UsageBeforeDelete;
-  const usageAfterInsert = jsonApex.UsageAfterInsert;
-  const usageAfterUpdate = jsonApex.UsageAfterUpdate;
-  const usageAfterDelete = jsonApex.UsageAfterDelete;
-  const usageAfterUndelete = jsonApex.UsageAfterUndelete;
-  const entityDefinition = jsonApex.EntityDefinition;
+  const usageBeforeInsert = apex.UsageBeforeInsert;
+  const usageBeforeUpdate = apex.UsageBeforeUpdate;
+  const usageBeforeDelete = apex.UsageBeforeDelete;
+  const usageAfterInsert = apex.UsageAfterInsert;
+  const usageAfterUpdate = apex.UsageAfterUpdate;
+  const usageAfterDelete = apex.UsageAfterDelete;
+  const usageAfterUndelete = apex.UsageAfterUndelete;
+  const entityDefinition = apex.EntityDefinition;
 
   switch (attributes.type) {
     case 'ApexClass':
-      return createHeaderAreaApexClass({
-        namespace: namespace,
-        manageableState: manageableState,
-        apiVersion: apiVersion,
-        annotations: annotations,
-        modifiers: modifiers,
-        name: name,
-        parentClass: parentClass,
-        interfaces: interfaces
-      });
+      return _createHeaderArea(
+        {
+          namespace: namespace,
+          manageableState: manageableState,
+          apiVersion: apiVersion,
+          annotations: annotations,
+          modifiers: modifiers,
+          name: name,
+          parentClass: parentClass,
+          interfaces: interfaces,
+          body: body
+        },
+        { createTableTarget: createTableClass }
+      );
     case 'ApexTrigger':
-      return createHeaderAreaApexTrigger({
-        namespace: namespace,
-        manageableState: manageableState,
-        apiVersion: apiVersion,
-        usageBeforeInsert: usageBeforeInsert,
-        usageBeforeUpdate: usageBeforeUpdate,
-        usageBeforeDelete: usageBeforeDelete,
-        usageAfterInsert: usageAfterInsert,
-        usageAfterUpdate: usageAfterUpdate,
-        usageAfterDelete: usageAfterDelete,
-        usageAfterUndelete: usageAfterUndelete,
-        name: name,
-        entityDefinition: entityDefinition
-      });
+      return _createHeaderArea(
+        {
+          namespace: namespace,
+          manageableState: manageableState,
+          apiVersion: apiVersion,
+          usageBeforeInsert: usageBeforeInsert,
+          usageBeforeUpdate: usageBeforeUpdate,
+          usageBeforeDelete: usageBeforeDelete,
+          usageAfterInsert: usageAfterInsert,
+          usageAfterUpdate: usageAfterUpdate,
+          usageAfterDelete: usageAfterDelete,
+          usageAfterUndelete: usageAfterUndelete,
+          name: name,
+          entityDefinition: entityDefinition,
+          body: body
+        },
+        { createTableTarget: createTableTrigger }
+      );
     default:
       return {};
   }
+};
+
+/**
+ * @description _parseBodyHeader
+ * @param {*} body
+ * @param {*} regexp
+ */
+const _parseBodyHeader = (body, regexp) => {
+  const header = extractApexDoc(body, regexp);
+  console.log(`\n## Header`);
+  console.log(JSON.stringify(header));
+
+  return {
+    header: header
+  };
+};
+
+/**
+ * @description parseBodyHeader
+ * @param {*} body
+ * @param {*} type
+ */
+export const parseBodyHeader = (body, type) => {
+  return _parseBodyHeader(body, {
+    target: 'ApexClass' === type ? REGEXP_HEADER_CLASS : REGEXP_HEADER_TRIGGER,
+    tags: REGEXP_TAGS_HEADER,
+    tagsArea: REGEXP_TAGS_AREA_HEADER,
+    annotationsEnd: REGEXP_ANNOTATIONS_END_HEADER,
+    signatureStart: REGEXP_SIGNATURE_START_HEADER,
+    signatureEnd: REGEXP_SIGNATURE_END_HEADER
+  });
 };

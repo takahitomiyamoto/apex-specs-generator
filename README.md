@@ -39,4 +39,33 @@ yarn install && yarn gulp:init
 yarn gulp:specs:apex:generate && yarn prettier
 ```
 
+#### Example
+
+```sh
+cd ..
+
+git clone https://github.com/trailheadapps/apex-recipes
+
+cd apex-recipes
+
+sfdx force:org:create -a apex-recipes -s -f config/project-scratch-def.json -v DevHub
+
+sfdx force:source:push -u apex-recipes
+
+sfdx force:org:open -u apex-recipes
+
+# TODO: create a connected app
+
+cd apex-specs-generator
+
+# TODO: update environment.json
+
+yarn gulp:specs:apex:generate && yarn prettier
+```
+
 You can see your Apex specification documents in `docs/`.
+
+## Acknowledgments
+
+- [ApexDoc](https://github.com/SalesforceFoundation/ApexDoc)
+- [TypeDoc](https://github.com/TypeStrong/typedoc)

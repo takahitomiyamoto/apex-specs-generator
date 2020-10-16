@@ -1,54 +1,53 @@
 /**
  * @name doc/external-references.js
  */
-import {
-  NOT_APPLICABLE,
-  HEADERS_EXTERNAL_REFERENCES_TABLE,
-  TITLE_EXTERNAL_REFERENCES
-} from './config';
+import { TABLE_HEADER_EXTERNAL_REFERENCES } from './config';
 import { getMethods, getVariables } from './common';
+import { createTable } from './table';
 
 /**
- * @description createExternalReferencesTableRows
- * @param {*} params
+ * @description _createTableRow
+ * @param {*} exte
  */
-const createExternalReferencesTableRows = (params) => {
+const _createTableRow = (exte) => {
+  const variables = getVariables(exte.variables);
+  const methods = getMethods(exte.methods);
+
+  const row = [];
+  row.push(`${exte.namespace}`);
+  row.push(`${exte.name}`);
+  row.push(`${variables}`);
+  row.push(`${methods}`);
+  return row;
+};
+
+/**
+ * @description _createTableRows
+ * @param {*} params
+ * @param {*} funcs
+ */
+const _createTableRows = (params, funcs) => {
   return params.map((exte) => {
-    return [
-      `${exte.namespace}`,
-      `${exte.name}`,
-      `${getVariables(exte.variables)}`,
-      `${getMethods(exte.methods)}`
-    ];
+    return funcs.createTableRow(exte);
   });
 };
 
 /**
- * @description createExternalReferencesTable
+ * @description createTableExternalReferences
  * @param {*} params
  */
-const createExternalReferencesTable = (params) => {
-  return {
-    headers: HEADERS_EXTERNAL_REFERENCES_TABLE,
-    rows: createExternalReferencesTableRows(params)
-  };
+export const createTableExternalReferences = (params) => {
+  return createTable(params, TABLE_HEADER_EXTERNAL_REFERENCES, {
+    createTableRow: _createTableRow,
+    createTableRows: _createTableRows
+  });
 };
 
 /**
- * @description createExternalReferencesArea
+ * @description createExternalReferences
  * @param {*} params
  */
-export const createExternalReferencesArea = (params) => {
-  const result = [];
-  result.push({ h2: TITLE_EXTERNAL_REFERENCES });
-
-  if (!params.length) {
-    result.push({ p: NOT_APPLICABLE });
-  } else {
-    result.push({
-      table: createExternalReferencesTable(params)
-    });
-  }
-
-  return result;
+export const createExternalReferences = (params) => {
+  const externalReferences = params.items;
+  return createTableExternalReferences(externalReferences);
 };

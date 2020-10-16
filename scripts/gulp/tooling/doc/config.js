@@ -3,34 +3,173 @@
  */
 import { getApexClasses, getApexTriggers } from '../../common/lib';
 
-export const HEADERS_CLASS_TABLE = [
+/*********************
+ * common
+ *********************/
+export const NO_DATA =
+  '※ ApexDoc が存在しないか、該当する Signature が見つかりません。';
+const ACCESS_MODIFIER = `[private|protected|public|global]*[\\sabstract|\\svirtual|\\soverride]*[\\sstatic|\\stransient]*[\\sfinal]*[with|without|inherited]*[\\ssharing]*`;
+const ANNOTATIONS = `[\\@\\w\\(\\=\\'\\/\\)\\n]*`;
+const ANNOTATIONS_END = '\\n\\s+';
+const ASSIGNED_VALUE = `[\\s\\=\\w\\.\\(\\)<>,]*;\\n`;
+const CLASS_OPTIONS = `(extends\\s[\\w<>]+\\s|implements\\s\\w+\\s)*`;
+const NAME = `(\\w+)`;
+const VALUE = `(.+(\\s\\(\\)\\.<>,:;='")*)`;
+const RETURN_TYPE = `[\\w\\.<>]`;
+const TAGS_AREA_START = `\\/\\*+\\n`;
+const TAGS_AREA_END = `\\s+\\*+\\/\\n`;
+const TAGS_BODY_ITEM = `\\s\\*\\s\\@${NAME}\\s${VALUE}\\n`;
+const TAGS_BODY = `([${TAGS_BODY_ITEM}]+)`;
+const SIGNATURE_END = '\n$';
+const SIGNATURE_START = `^\\s+`;
+const SIGNATURE_END_CLASS = `\\s*\\{`;
+const METHOD_PARAMS = `[\\w\\s\\n\\.,<>]*`;
+const TRIGGER_PARAMS = `[\\w\\s\\n,]+`;
+
+// FIXME: https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_classes_properties.htm
+const GET_SET = `\\s\\{\\s+get;\\sset;\\s\\}\n`;
+
+export const REGEXP_PARAM_LIST_TYPE = new RegExp(`<+[\\w.]*>+`, 'g');
+export const REGEXP_PARAM_LEFT_PARENTHESIS = new RegExp(`\\(\\n\\s*`, 'g');
+export const REGEXP_PARAM_RIGHT_PARENTHESIS = new RegExp(`\\n\\s*\\)`, 'g');
+export const REGEXP_PARAM_COMMA = new RegExp(`,\\n\\s*`, 'g');
+
+/*********************
+ * target
+ *********************/
+export const REGEXP_HEADER_CLASS = new RegExp(
+  `^${TAGS_AREA_START}${TAGS_BODY}${TAGS_AREA_END}` +
+    `${ANNOTATIONS}` +
+    `${ACCESS_MODIFIER}` +
+    `\\sclass\\s${NAME}\\s${CLASS_OPTIONS}${SIGNATURE_END_CLASS}`,
+  'g'
+);
+export const REGEXP_HEADER_TRIGGER = new RegExp(
+  `^${TAGS_AREA_START}${TAGS_BODY}${TAGS_AREA_END}` +
+    `${ANNOTATIONS}` +
+    `trigger\\s${NAME}\\son\\s${NAME}\\(${TRIGGER_PARAMS}\\)${SIGNATURE_END_CLASS}`,
+  'g'
+);
+export const REGEXP_INNER_CLASS = new RegExp(
+  `\\s+${TAGS_AREA_START}${TAGS_BODY}${TAGS_AREA_END}` +
+    `\\s+${ANNOTATIONS}` +
+    `\\s+${ACCESS_MODIFIER}` +
+    `\\sclass\\s${NAME}\\s${CLASS_OPTIONS}${SIGNATURE_END_CLASS}`,
+  'g'
+);
+export const REGEXP_PROPERTY = new RegExp(
+  `\\s+${TAGS_AREA_START}${TAGS_BODY}${TAGS_AREA_END}` +
+    `\\s+${ANNOTATIONS}` +
+    `\\s+${ACCESS_MODIFIER}` +
+    `\\s${RETURN_TYPE}+\\s${NAME}${ASSIGNED_VALUE}`,
+  'g'
+);
+export const REGEXP_PROPERTY_GET_SET = new RegExp(
+  `\\s+${TAGS_AREA_START}${TAGS_BODY}${TAGS_AREA_END}` +
+    `\\s+${ANNOTATIONS}` +
+    `\\s+${ACCESS_MODIFIER}` +
+    `\\s${RETURN_TYPE}+\\s${NAME}${GET_SET}`,
+  'g'
+);
+export const REGEXP_CONSTRUCTOR = new RegExp(
+  `\\s+${TAGS_AREA_START}${TAGS_BODY}${TAGS_AREA_END}` +
+    `\\s+${ANNOTATIONS}` +
+    `\\s+${ACCESS_MODIFIER}` +
+    `\\s${NAME}\\(${METHOD_PARAMS}\\)${SIGNATURE_END_CLASS}`,
+  'g'
+);
+export const REGEXP_METHOD = new RegExp(
+  `\\s+${TAGS_AREA_START}${TAGS_BODY}${TAGS_AREA_END}` +
+    `\\s+${ANNOTATIONS}` +
+    `\\s+${ACCESS_MODIFIER}` +
+    `\\s${RETURN_TYPE}+\\s${NAME}\\(${METHOD_PARAMS}\\)${SIGNATURE_END_CLASS}`,
+  'g'
+);
+
+/*********************
+ * tags
+ *********************/
+export const REGEXP_TAGS_HEADER = new RegExp(TAGS_BODY_ITEM, 'g');
+export const REGEXP_TAGS_INNER_CLASS = new RegExp(TAGS_BODY_ITEM, 'g');
+export const REGEXP_TAGS_PROPERTY = new RegExp(TAGS_BODY_ITEM, 'g');
+export const REGEXP_TAGS_CONSTRUCTOR = new RegExp(TAGS_BODY_ITEM, 'g');
+export const REGEXP_TAGS_METHOD = new RegExp(TAGS_BODY_ITEM, 'g');
+
+/*********************
+ * tagsArea
+ *********************/
+export const REGEXP_TAGS_AREA_HEADER = new RegExp(
+  `${TAGS_AREA_START}${TAGS_BODY}${TAGS_AREA_END}`,
+  'g'
+);
+export const REGEXP_TAGS_AREA_INNER_CLASS = new RegExp(
+  `\\s+${TAGS_AREA_START}${TAGS_BODY}${TAGS_AREA_END}`,
+  'g'
+);
+export const REGEXP_TAGS_AREA_PROPERTY = new RegExp(
+  `\\s+${TAGS_AREA_START}${TAGS_BODY}${TAGS_AREA_END}`,
+  'g'
+);
+export const REGEXP_TAGS_AREA_CONSTRUCTOR = new RegExp(
+  `\\s+${TAGS_AREA_START}${TAGS_BODY}${TAGS_AREA_END}`,
+  'g'
+);
+export const REGEXP_TAGS_AREA_METHOD = new RegExp(
+  `\\s+${TAGS_AREA_START}${TAGS_BODY}${TAGS_AREA_END}`,
+  'g'
+);
+
+/*********************
+ * annotationsEnd
+ *********************/
+export const REGEXP_ANNOTATIONS_END_HEADER = new RegExp(ANNOTATIONS_END);
+export const REGEXP_ANNOTATIONS_END_INNER_CLASS = new RegExp(ANNOTATIONS_END);
+export const REGEXP_ANNOTATIONS_END_PROPERTY = new RegExp(ANNOTATIONS_END);
+export const REGEXP_ANNOTATIONS_END_CONSTRUCTOR = new RegExp(ANNOTATIONS_END);
+export const REGEXP_ANNOTATIONS_END_METHOD = new RegExp(ANNOTATIONS_END);
+
+/*********************
+ * signatureStart
+ *********************/
+export const REGEXP_SIGNATURE_START_HEADER = '';
+export const REGEXP_SIGNATURE_START_INNER_CLASS = new RegExp(SIGNATURE_START);
+export const REGEXP_SIGNATURE_START_PROPERTY = new RegExp(SIGNATURE_START);
+export const REGEXP_SIGNATURE_START_CONSTRUCTOR = new RegExp(SIGNATURE_START);
+export const REGEXP_SIGNATURE_START_METHOD = new RegExp(SIGNATURE_START);
+
+/*********************
+ * signatureEnd
+ *********************/
+export const REGEXP_SIGNATURE_END_HEADER = new RegExp(SIGNATURE_END_CLASS);
+export const REGEXP_SIGNATURE_END_INNER_CLASS = new RegExp(SIGNATURE_END_CLASS);
+export const REGEXP_SIGNATURE_END_PROPERTY = new RegExp(SIGNATURE_END);
+export const REGEXP_SIGNATURE_END_CONSTRUCTOR = new RegExp(SIGNATURE_END_CLASS);
+export const REGEXP_SIGNATURE_END_METHOD = new RegExp(SIGNATURE_END_CLASS);
+
+/*********************
+ * keyStart
+ *********************/
+export const REGEXP_KEY_START_METHOD = new RegExp(
+  `${ANNOTATIONS}${ACCESS_MODIFIER}\\s${RETURN_TYPE}+\\s`
+);
+
+/*********************
+ * TABLE_HEADER
+ *********************/
+export const TABLE_HEADER_APEX_DOC = ['Description'];
+export const TABLE_HEADER_HEADER = [
+  'Namespace',
+  'Manageable State',
+  'API Version'
+];
+export const TABLE_HEADER_CLASS = [
   'Annotation',
   'Modifier',
   'Name',
   'Parent Class',
   'Interfaces'
 ];
-export const HEADERS_CONSTRUCTORS_TABLE = ['Modifier', 'Name'];
-export const HEADERS_EXTERNAL_REFERENCES_TABLE = [
-  'Namespace',
-  'Name',
-  'Variables',
-  'Methods'
-];
-export const HEADERS_HEADER_TABLE = [
-  'Namespace',
-  'Manageable State',
-  'API Version'
-];
-export const HEADERS_METHODS_TABLE = ['Annotation', 'Modifier', 'Type', 'Name'];
-export const HEADERS_PARAMETERS_TABLE = ['Type', 'Name'];
-export const HEADERS_PROPERTIES_TABLE = [
-  'Annotations',
-  'Modifier',
-  'Type',
-  'Name'
-];
-export const HEADERS_TRIGGER_TABLE = [
+export const TABLE_HEADER_TRIGGER = [
   'Before Insert',
   'Before Update',
   'Before Delete',
@@ -39,6 +178,36 @@ export const HEADERS_TRIGGER_TABLE = [
   'After Delete',
   'After Undelete'
 ];
+export const TABLE_HEADER_EXTERNAL_REFERENCES = [
+  'Namespace',
+  'Name',
+  'Variables',
+  'Methods'
+];
+export const TABLE_HEADER_PROPERTIES = [
+  'Annotations',
+  'Modifier',
+  'Type',
+  'Name'
+];
+export const TABLE_HEADER_CONSTRUCTORS = [
+  'Annotation',
+  'Modifier',
+  'Name',
+  'Parameters'
+];
+export const TABLE_HEADER_METHODS = [
+  'Annotation',
+  'Modifier',
+  'Return Type',
+  'Name',
+  'Parameters'
+];
+export const TABLE_HEADER_PARAMETERS = ['Type', 'Name'];
+
+/*********************
+ * TITLE
+ *********************/
 export const NOT_APPLICABLE = 'N/A';
 export const TITLE_CONSTRUCTORS = 'Constructors';
 export const TITLE_EXTERNAL_REFERENCES = 'External References';
@@ -142,4 +311,15 @@ export const convert = (value) => {
  */
 export const escapeUnderscore = (value) => {
   return value.replace(/_/g, '\\_');
+};
+
+/**
+ * @description convertSignature
+ * @param {*} signature
+ */
+export const convertSignature = (signature) => {
+  return signature
+    .replace(REGEXP_PARAM_LEFT_PARENTHESIS, '(\n  ')
+    .replace(REGEXP_PARAM_RIGHT_PARENTHESIS, '\n)')
+    .replace(REGEXP_PARAM_COMMA, ',\n  ');
 };

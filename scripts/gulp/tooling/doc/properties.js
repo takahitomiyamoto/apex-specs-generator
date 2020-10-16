@@ -2,97 +2,142 @@
  * @name doc/properties.js
  */
 import {
-  NOT_APPLICABLE,
-  HEADERS_PROPERTIES_TABLE,
-  TITLE_PROPERTIES
+  createTarget,
+  extractApexDoc,
+  getAnnotations,
+  getModifiers
+} from './common';
+import {
+  REGEXP_ANNOTATIONS_END_PROPERTY,
+  REGEXP_PROPERTY,
+  REGEXP_PROPERTY_GET_SET,
+  REGEXP_SIGNATURE_END_PROPERTY,
+  REGEXP_SIGNATURE_START_PROPERTY,
+  REGEXP_TAGS_PROPERTY,
+  REGEXP_TAGS_AREA_PROPERTY,
+  TABLE_HEADER_PROPERTIES
 } from './config';
-import { getAnnotations, getModifiers } from './common';
+import { createTable } from './table';
 
 /**
- * @description createClassTableRows
+ * @description createTableRowProperty
  * @param {*} params
  */
-const createClassTableRows = (params) => {
+export const createTableRowProperty = (params) => {
   const annotations = getAnnotations(params.annotations);
   const modifiers = getModifiers(params.modifiers);
-  return [
-    [`${annotations}`, `${modifiers}`, `${params.type}`, `${params.name}`]
-  ];
+
+  const row = [];
+  row.push(annotations);
+  row.push(modifiers);
+  row.push(params.type);
+  row.push(params.name);
+  return row;
 };
 
 /**
- * @description setPropertyTable
+ * @description _createTableRows
  * @param {*} params
+ * @param {*} funcs
  */
-const setPropertyTable = (params) => {
-  return {
-    headers: HEADERS_PROPERTIES_TABLE,
-    rows: createClassTableRows(params)
-  };
+const _createTableRows = (params, funcs) => {
+  return !params.length
+    ? [funcs.createTableRow(params)]
+    : params.map((prop) => {
+        return funcs.createTableRow(prop);
+      });
 };
 
 /**
- * @description createPropertyCodeContent
+ * @description createTableProperties
  * @param {*} params
+ * @param {*} funcs
  */
-const createPropertyCodeContent = (params) => {
-  const content = [];
-
-  if (params.annotations.length) {
-    const annotations = getAnnotations(params.annotations);
-    content.push(annotations);
-  }
-
-  let contentMain = `${getModifiers(params.modifiers)} ${params.type} ${
-    params.name
-  }`;
-  content.push(contentMain);
-
-  return content;
+export const createTableProperties = (params) => {
+  return createTable(params, TABLE_HEADER_PROPERTIES, {
+    createTableRow: createTableRowProperty,
+    createTableRows: _createTableRows
+  });
 };
 
 /**
- * @description setPropertyCode
- * @param {*} params
+ * @description _fetchItem
+ * @param {*} prop
+ * @param {*} body
  */
-const setPropertyCode = (params) => {
-  return {
-    language: 'java',
-    content: createPropertyCodeContent(params)
-  };
+const _fetchItem = (prop, body) => {
+  const item = body.properties.filter((i) => {
+    return prop.name === i.name;
+  });
+  return !item.length ? null : item[0];
+};
+
+/**
+ * @description _createTitle
+ * @param {*} prop
+ */
+const _createTitle = (prop) => {
+  return { h3: prop.name };
 };
 
 /**
  * @description createProperties
  * @param {*} params
  */
-const createProperties = (params) => {
-  return params.map((prop) => {
-    return [
-      { h3: prop.name },
-      {
-        table: setPropertyTable(prop)
-      },
-      {
-        code: setPropertyCode(prop)
-      }
-    ];
+export const createProperties = (params) => {
+  const properties = params.items;
+  const body = params.body;
+
+  return properties.map((prop) => {
+    return createTarget(prop, body, {
+      fetchItem: _fetchItem,
+      createTitle: _createTitle,
+      createTableTarget: createTableProperties
+    });
   });
 };
 
 /**
- * @description createPropertiesArea
- * @param {*} params
+ * @description _parseBodyProperties
+ * @param {*} body
+ * @param {*} regexps
  */
-export const createPropertiesArea = (params) => {
-  const result = [];
-  result.push({ h2: TITLE_PROPERTIES });
+const _parseBodyProperties = (body, regexps) => {
+  let properties = [];
+  regexps.forEach((regexp) => {
+    const _properties = extractApexDoc(body, regexp);
+    properties = properties.concat(_properties);
+  });
 
-  if (!params.length) {
-    result.push({ p: NOT_APPLICABLE });
-  } else {
-    result.push(createProperties(params));
-  }
+  console.log(`\n## Properties`);
+  console.log(JSON.stringify(properties));
 
-  return result;
+  return {
+    properties: properties
+  };
+};
+
+/**
+ * @description parseBodyProperties
+ * @param {*} body
+ */
+export const parseBodyProperties = (body) => {
+  return _parseBodyProperties(body, [
+    {
+      target: REGEXP_PROPERTY,
+      tags: REGEXP_TAGS_PROPERTY,
+      tagsArea: REGEXP_TAGS_AREA_PROPERTY,
+      annotationsEnd: REGEXP_ANNOTATIONS_END_PROPERTY,
+      signatureStart: REGEXP_SIGNATURE_START_PROPERTY,
+      signatureEnd: REGEXP_SIGNATURE_END_PROPERTY
+    },
+    {
+      target: REGEXP_PROPERTY_GET_SET,
+      tags: REGEXP_TAGS_PROPERTY,
+      tagsArea: REGEXP_TAGS_AREA_PROPERTY,
+      annotationsEnd: REGEXP_ANNOTATIONS_END_PROPERTY,
+      signatureStart: REGEXP_SIGNATURE_START_PROPERTY,
+      signatureEnd: REGEXP_SIGNATURE_END_PROPERTY
+    }
+  ]);
 };
