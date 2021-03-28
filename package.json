@@ -16,22 +16,22 @@
     "prettier": "prettier \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\" --write --loglevel log"
   },
   "devDependencies": {
-    "@babel/cli": "7.12.0",
-    "@babel/core": "7.12.0",
-    "@babel/preset-env": "7.12.0",
-    "@babel/register": "7.12.0",
-    "@prettier/plugin-xml": "0.12.0",
-    "@salesforce/eslint-config-lwc": "0.7.0",
+    "@babel/cli": "7.13.10",
+    "@babel/core": "7.13.13",
+    "@babel/preset-env": "7.13.12",
+    "@babel/register": "7.13.8",
+    "@prettier/plugin-xml": "0.13.1",
+    "@salesforce/eslint-config-lwc": "0.11.0",
     "@salesforce/eslint-plugin-aura": "1.4.0",
-    "eslint": "7.11.0",
+    "eslint": "7.23.0",
     "gulp": "4.0.2",
     "gulp-babel": "8.0.0",
     "gulp-shell": "0.8.0",
     "heat-sfdx-common": "0.1.14",
-    "heat-sfdx-tooling": "0.0.2",
-    "json2md": "1.9.0",
-    "prettier": "2.1.2",
-    "prettier-plugin-apex": "1.7.0",
-    "uuid": "8.3.1"
+    "heat-sfdx-tooling": "0.0.3",
+    "json2md": "1.10.0",
+    "prettier": "2.2.1",
+    "prettier-plugin-apex": "1.8.0",
+    "uuid": "8.3.2"
   }
 }
